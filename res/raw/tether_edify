@@ -1,0 +1,130 @@
+# This script controls actions to be taken when the tethering is started or stopped.
+# @Version=94
+# ------------------------------------------------------------------------------------
+# It uses the "edify" language, which is also used for the android OTA update scripts. 
+# See:
+# http://android.git.kernel.org/?p=platform/bootable/recovery.git;a=tree;f=edify;h=04720f8aaa9a5e0079b79f8be7f11b7f74414162;hb=HEAD
+# ------------------------------------------------------------------------------------
+
+#
+# Actions for starting tethering
+#
+action() == "start" && (
+  #
+  # Set "status"-Property
+  #
+  setprop("tether.status","running");
+
+  #
+  # Make sure to kill old processes
+  #
+  kill_pidfile("/data/data/android.tether/var/fixpersist.pid");
+  kill_pidfile("/data/data/android.tether/var/fixroute.pid");
+  file_unlink("/data/data/android.tether/var/fixpersist.pid");
+  file_unlink("/data/data/android.tether/var/fixroute.pid");
+
+  #
+  # Wifi mode, do some wifi things...
+  #
+  getcfg("tether.mode") == "wifi" && (
+	#
+	# Set "status"-Property
+	#
+    setprop("tether.mode","wifi");
+  
+    getcfg("device.type") == "generic" && (
+      #
+      # Generic device
+      # 
+      log(load_wifi(), "Loading WiFi driver");
+      
+      #
+      # Bring up wifi interface
+      #
+      log(run_program("/data/data/android.tether/bin/ifconfig " + getcfg("wifi.interface") + " " + getcfg("ip.gateway") + " netmask " + getcfg("ip.netmask")) &&
+                  run_program("/data/data/android.tether/bin/ifconfig " + getcfg("wifi.interface") + " up"),  "Activating WiFi interface");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " mode ad-hoc"), "Setting ad-hoc mode");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " essid " + getcfg("wifi.essid")), "Setting essid");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " channel " + getcfg("wifi.channel")), "Setting channel");
+	  getcfg("wifi.txpower") != "disabled" && (
+	      	log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " txpower " + getcfg("wifi.txpower")), "Setting transmit power");     	
+	  );      
+      run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " commit");
+    );
+    
+    getcfg("device.type") == "ally" && (
+      #
+      # LG Ally
+      #
+  	  module_loaded("wireless") || log(insmod("/system/lib/modules/wireless.ko", "firmware_path=/system/etc/wl/rtecdc.bin nvram_path=/system/etc/wl/nvram.txt config_path=/data/misc/wifi/config"), "Loading wireless.ko module");
+      sleep("3");
+      #
+      # Bring up wifi interface
+      #
+      log(run_program("/data/data/android.tether/bin/ifconfig " + getcfg("wifi.interface") + " " + getcfg("ip.gateway") + " netmask " + getcfg("ip.netmask")) &&
+                  run_program("/data/data/android.tether/bin/ifconfig " + getcfg("wifi.interface") + " up"),  "Activating WiFi interface");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " mode ad-hoc"), "Setting ad-hoc mode");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " essid " + getcfg("wifi.essid")), "Setting essid");
+      log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " channel " + getcfg("wifi.channel")), "Setting channel");
+	  getcfg("wifi.txpower") != "disabled" && (
+	      	log(run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " txpower " + getcfg("wifi.txpower")), "Setting transmit power");     	
+	  );
+      run_program("/data/data/android.tether/bin/iwconfig " + getcfg("wifi.interface") + " commit");
+    );
+    
+  );
+
+  log("Tethering now running");
+);
+
+#
+# Actions when stopping tether
+#
+action() == "stop" && (
+  #
+  # Set "status"-Property
+  #
+  setprop("tether.status","stopped");
+
+  #
+  # Wifi mode, bring interface down, kill dnsmasq/wpa_supplicant, remove module.
+  #
+  getcfg("tether.mode") == "wifi" && (
+    kill_process("wpa_supplicant");
+    kill_process("dnsmasq");
+    kill_pidfile("/data/data/android.tether/var/hostapd.pid");
+	kill_pidfile("/data/data/android.tether/var/fixpersist.pid");
+	kill_pidfile("/data/data/android.tether/var/fixroute.pid");
+	file_unlink("/data/data/android.tether/var/fixpersist.pid");
+	file_unlink("/data/data/android.tether/var/fixroute.pid");
+    run_program("/data/data/android.tether/bin/ifconfig " +  getcfg("wifi.interface") + " down");
+    
+    getcfg("device.type") == "generic" && (
+      unload_wifi();
+    );
+
+    module_loaded("bcm4329") && rmmod("bcm4329");
+    module_loaded("bcm4325") && rmmod("bcm4325");
+    module_loaded("wlan") && rmmod("wlan");
+    module_loaded("tiwlan_drv") && rmmod("tiwlan_drv");
+    module_loaded("tiap_drv") && rmmod("tiap_drv");
+    module_loaded("sdio") && rmmod("sdio");
+    module_loaded("dhd") && rmmod("dhd");
+    module_loaded("wireless") && rmmod("wireless");
+    module_loaded("ar6000") && rmmod("ar6000");
+  );
+
+  #
+  # Remove old dnsmasq.leases and pid-file
+  #
+  file_exists("/data/data/android.tether/var/dnsmasq.leases") && (
+  	file_unlink("/data/data/android.tether/var/dnsmasq.leases");
+  );
+  file_exists("/data/data/android.tether/var/dnsmasq.pid") && (
+    file_unlink("/data/data/android.tether/var/dnsmasq.pid");
+  );
+  file_exists("/data/data/android.tether/var/setssid.pid") && (
+    file_unlink("/data/data/android.tether/var/setssid.pid");
+  );
+  log("Tethering now stopped");
+);
