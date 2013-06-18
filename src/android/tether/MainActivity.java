@@ -13,42 +13,12 @@
 package android.tether;
 
 
-import android.R.drawable;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.app.AlertDialog.Builder;
-import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
@@ -58,9 +28,6 @@ public class MainActivity extends Activity {
 	private OnClickListener startBtnListener = null;
 	private Button stopBtn = null;
 	private OnClickListener stopBtnListener = null;
-	
-	private static int ID_DIALOG_STARTING = 0;
-	private static int ID_DIALOG_STOPPING = 1;
 	
 	public static final int MESSAGE_CHECK_LOG = 1;
 	public static final int MESSAGE_CANT_START_TETHER = 2;

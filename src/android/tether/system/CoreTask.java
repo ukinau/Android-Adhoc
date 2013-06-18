@@ -22,12 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 
-import android.tether.data.ClientData;
 import android.util.Log;
 
 public class CoreTask {
@@ -101,50 +98,6 @@ public class CoreTask {
 	    		return true;
 	    	}
 	    	return false;
-	    }
-	}
-	
-	public class TiWlanConf {
-	    /*
-	     * Handle operations on the TiWlan.conf file.
-	     */
-	    public Hashtable<String,String> get() {
-	    	Hashtable<String,String> tiWlanConf = new Hashtable<String,String>();
-	    	ArrayList<String> lines = readLinesFromFile(DATA_FILE_PATH+"/conf/tiwlan.ini");
-
-	    	for (String line : lines) {
-	    		String[] pair = line.split("=");
-	    		if (pair[0] != null && pair[1] != null && pair[0].length() > 0 && pair[1].length() > 0) {
-	    			tiWlanConf.put(pair[0].trim(), pair[1].trim());
-	    		}
-	    	}
-	    	return tiWlanConf;
-	    }
-	 
-	    public synchronized boolean write(String name, String value) {
-	    	Hashtable<String, String> table = new Hashtable<String, String>();
-	    	table.put(name, value);
-	    	return write(table);
-	    }
-	    
-	    public synchronized boolean write(Hashtable<String,String> values) {
-	    	String filename = DATA_FILE_PATH+"/conf/tiwlan.ini";
-	    	ArrayList<String> valueNames = Collections.list(values.keys());
-
-	    	String fileString = "";
-	    	
-	    	ArrayList<String> inputLines = readLinesFromFile(filename);
-	    	for (String line : inputLines) {
-	    		for (String name : valueNames) {
-	        		if (line.contains(name)){
-		    			line = name+" = "+values.get(name);
-		    			break;
-		    		}
-	    		}
-	    		line+="\n";
-	    		fileString += line;
-	    	}
-	    	return writeLinesToFile(filename, fileString); 	
 	    }
 	}
 	
@@ -340,7 +293,6 @@ public class CoreTask {
     	}
     	return outdated;
     }
-
     
     public long getModifiedDate(String filename) {
     	File file = new File(filename);
@@ -348,77 +300,6 @@ public class CoreTask {
     		return -1;
     	}
     	return file.lastModified();
-    }
-
-    public synchronized boolean writeLanConf(String lanconfString) {
-    	boolean writesuccess = false;
-    	
-    	String filename = null;
-    	ArrayList<String> inputLines = null;
-    	String fileString = null;
-    	
-    	// Assemble gateway-string
-    	String[] lanparts = lanconfString.split("\\.");
-    	String gateway = lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".254";
-    	
-    	// Assemble dnsmasq dhcp-range
-    	String iprange = lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".100,"+lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".105,12h";
-    	
-    	// Update bin/blue_up.sh
-    	fileString = "";
-    	filename = this.DATA_FILE_PATH+"/bin/blue-up.sh";
-    	inputLines = readLinesFromFile(filename);   
-    	for (String line : inputLines) {
-    		if (line.contains("ifconfig bnep0") && line.endsWith("netmask 255.255.255.0 up >> $tetherlog 2>> $tetherlog")) {
-    			line = reassembleLine(line, " ", "bnep0", gateway);
-    		}    		
-    		fileString += line+"\n";
-    	}
-    	writesuccess = writeLinesToFile(filename, fileString);
-    	if (writesuccess == false) {
-    		Log.e(MSG_TAG, "Unable to update bin/tether with new lan-configuration.");
-    		return writesuccess;
-    	}
-    	
-    	// Update conf/dnsmasq.conf
-    	fileString = "";
-    	filename = this.DATA_FILE_PATH+"/conf/dnsmasq.conf";
-    	inputLines = readLinesFromFile(filename);   
-    	for (String line : inputLines) {
-    		
-    		if (line.contains("dhcp-range")) {
-    			line = "dhcp-range="+iprange;
-    		}    		
-    		fileString += line+"\n";
-    	}
-    	writesuccess = writeLinesToFile(filename, fileString);
-    	if (writesuccess == false) {
-    		Log.e(MSG_TAG, "Unable to update conf/dnsmasq.conf with new lan-configuration.");
-    		return writesuccess;
-    	}    	
-    	return writesuccess;
-    }
-    
-    private String reassembleLine(String source, String splitPattern, String prefix, String target) {
-    	String returnString = new String();
-    	String[] sourceparts = source.split(splitPattern);
-    	boolean prefixmatch = false;
-    	boolean prefixfound = false;
-    	for (String part : sourceparts) {
-    		if (prefixmatch) {
-    			returnString += target+" ";
-    			prefixmatch = false;
-    		}
-    		else {
-    			returnString += part+" ";
-    		}
-    		if (prefixfound == false && part.trim().equals(prefix)) {
-    			prefixmatch = true;
-    			prefixfound = true;
-    		}
-
-    	}
-    	return returnString;
     }
     
 }

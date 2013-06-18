@@ -41,6 +41,8 @@ public final class R {
         public static final int wifi=0x7f02000d;
     }
     public static final class id {
+        public static final int ipAddressSetting=0x7f070002;
+        public static final int ipAddressSettingButton=0x7f070003;
         public static final int startTetherBtn=0x7f070000;
         public static final int stopTetherBtn=0x7f070001;
     }
@@ -48,24 +50,12 @@ public final class R {
         public static final int main=0x7f030000;
     }
     public static final class raw {
-        public static final int blue_down_sh=0x7f040000;
-        public static final int blue_up_sh=0x7f040001;
-        public static final int dnsmasq=0x7f040002;
-        public static final int dnsmasq_conf=0x7f040003;
-        public static final int fixpersist_sh=0x7f040004;
-        public static final int fixroute_sh=0x7f040005;
-        public static final int hostapd_conf_blade=0x7f040006;
-        public static final int hostapd_conf_droidx=0x7f040007;
-        public static final int ifconfig=0x7f040008;
-        public static final int iptables=0x7f040009;
-        public static final int iwconfig=0x7f04000a;
-        public static final int pand=0x7f04000b;
-        public static final int tether=0x7f04000c;
-        public static final int tether_conf=0x7f04000d;
-        public static final int tether_edify=0x7f04000e;
-        public static final int tiwlan_ini=0x7f04000f;
-        public static final int ultra_bcm_config=0x7f040010;
-        public static final int wpa_supplicant_conf=0x7f040011;
+        public static final int ifconfig=0x7f040000;
+        public static final int iwconfig=0x7f040001;
+        public static final int tether=0x7f040002;
+        public static final int tether_conf=0x7f040003;
+        public static final int tether_edify=0x7f040004;
+        public static final int wpa_supplicant_conf=0x7f040005;
     }
     public static final class string {
         public static final int about_layout_authors=0x7f050087;

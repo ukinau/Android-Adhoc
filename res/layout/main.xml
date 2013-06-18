@@ -2,16 +2,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity" >
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        
+        <Button
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/startTetherBtn"
+	        android:text="start" />
+	    <Button 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/stopTetherBtn"
+	        android:text="stop" />
+        
+    </LinearLayout>
+   
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5px"
+        android:text="IPアドレス設定" />
+        
+    <EditText
+        android:id="@+id/ipAddressSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <Button
+        android:id="@+id/ipAddressSettingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/startTetherBtn"
-        android:text="start" />
-    <Button 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/stopTetherBtn"
-        android:text="stop" />
+        android:layout_gravity="right"
+       	android:text="Setting" /> 
+       	
 </LinearLayout>

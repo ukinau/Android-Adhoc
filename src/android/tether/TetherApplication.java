@@ -44,20 +44,15 @@ public class TetherApplication extends Application {
 	private WifiManager wifiManager;
 	//public String tetherNetworkDevice = null;
 	
-
-	
 	// Preferences
 	public SharedPreferences settings = null;
 	public SharedPreferences.Editor preferenceEditor = null;
-	
 	
 	// Original States
 	private static boolean origWifiState = false;
 	
 	// Supplicant
 	public CoreTask.WpaSupplicant wpasupplicant = null;
-	// TiWlan.conf
-	public CoreTask.TiWlanConf tiwlan = null;
 	// tether.conf
 	public CoreTask.TetherConfig tethercfg = null;
 	
@@ -91,9 +86,6 @@ public class TetherApplication extends Application {
         
         // Supplicant config
         this.wpasupplicant = this.coretask.new WpaSupplicant();
-        
-        // tiwlan.conf
-        this.tiwlan = this.coretask.new TiWlanConf();
         
         // tether.cfg
         this.tethercfg = this.coretask.new TetherConfig();
@@ -257,31 +249,7 @@ public class TetherApplication extends Application {
 		    	if (message == null) {
 			    	message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/iwconfig", "0755", R.raw.iwconfig);
 		    	}
-		    	// ultra_bcm_config
-		    	if (message == null) {
-			    	message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/ultra_bcm_config", "0755", R.raw.ultra_bcm_config);
-		    	}
 				
-				/**
-				 * Installing fix-scripts if needed
-				 */
-				if (Configuration.enableFixPersist()) {	
-					// fixpersist.sh
-					if (message == null) {
-						message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/fixpersist.sh", "0755", R.raw.fixpersist_sh);
-					}				
-				}
-				if (Configuration.enableFixRoute()) {
-					// fixroute.sh
-					if (message == null) {
-						message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/fixroute.sh", "0755", R.raw.fixroute_sh);
-					}
-				}
-				
-		    	// tiwlan.ini
-				if (message == null) {
-					TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/conf/tiwlan.ini", "0644", R.raw.tiwlan_ini);
-				}
 				// edify script
 				if (message == null) {
 					TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/conf/tether.edify", "0644", R.raw.tether_edify);
