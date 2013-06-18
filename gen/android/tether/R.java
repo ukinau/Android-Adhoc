@@ -41,8 +41,12 @@ public final class R {
         public static final int wifi=0x7f02000d;
     }
     public static final class id {
+        public static final int ifconfig=0x7f070004;
         public static final int ipAddressSetting=0x7f070002;
         public static final int ipAddressSettingButton=0x7f070003;
+        public static final int iwconfig=0x7f070005;
+        public static final int iwlist=0x7f070006;
+        public static final int result=0x7f070007;
         public static final int startTetherBtn=0x7f070000;
         public static final int stopTetherBtn=0x7f070001;
     }

@@ -152,6 +152,19 @@ public class TetherApplication extends Application {
 		
 		Log.d(MSG_TAG, "Creation of configuration-files took ==> "+(System.currentTimeMillis()-startStamp)+" milliseconds.");
 	}
+
+	public String exec_Ifconfig(){
+		// get the interface	
+		String net_interface = this.tethercfg.get("wifi.interface"); 
+		String out = this.coretask.runCommand(this.coretask.DATA_FILE_PATH+"/bin/ifconfig "+net_interface);
+		return out;
+	}
+	
+	public String exec_Iwconfig(){
+		// Return the value of active interface , the other value of not active output as error-stream 
+		String out = this.coretask.runRootCommand_getOutput(this.coretask.DATA_FILE_PATH+"/bin/iwconfig");
+		return out;
+	}
 	
 	// Start/Stop Tethering
     public boolean startTether() {

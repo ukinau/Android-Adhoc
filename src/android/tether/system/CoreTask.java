@@ -266,6 +266,70 @@ public class CoreTask {
 		return false;
     }
     
+    public String runRootCommand_getOutput(String command){
+    	Runtime runtime = Runtime.getRuntime();
+        Process process;
+        String output = "";
+        String commandRaw = command;
+        int ret;
+        try {
+        		command = "su -c "+command;
+        		Log.d(MSG_TAG, command);
+                process = runtime.exec(command);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                                process.getInputStream()),8192);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                        output += line + "\n";
+                }
+                reader.close();
+                ret =  process.waitFor();
+                if(ret != 0){
+                	command = "su -c '"+commandRaw+" '";
+                	Log.d(MSG_TAG, command);
+                	process = runtime.exec(command);
+                    reader = new BufferedReader(new InputStreamReader(
+                                    process.getErrorStream()),8192);
+                    output = "";
+                    while ((line = reader.readLine()) != null) {
+                            output += line + "\n";
+                    }
+                    reader.close();
+                    ret =  process.waitFor();
+                }
+        } catch (IOException e) {
+                e.printStackTrace();
+
+        } catch (InterruptedException e) {
+                e.printStackTrace();
+        }
+        return output;
+    }
+    
+    public String runCommand(String command){
+    	Runtime runtime = Runtime.getRuntime();
+        Process process;
+        String output = "";
+        try {
+               	Log.d(MSG_TAG, command);
+                process = runtime.exec(command);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                                process.getInputStream()),8192);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                        output += line + "\n";
+                }
+                reader.close();
+                process.waitFor();
+        } catch (IOException e) {
+                e.printStackTrace();
+
+        } catch (InterruptedException e) {
+                e.printStackTrace();
+        }
+        return output;
+    }
+    
     public String getProp(String property) {
     	return NativeTask.getProp(property);
     }

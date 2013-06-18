@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends Activity {
 	
@@ -28,6 +29,9 @@ public class MainActivity extends Activity {
 	private OnClickListener startBtnListener = null;
 	private Button stopBtn = null;
 	private OnClickListener stopBtnListener = null;
+	private Button ifconfigBtn = null;
+	private Button iwconfigBtn = null;
+	private Button iwlistBtn = null;
 	
 	public static final int MESSAGE_CHECK_LOG = 1;
 	public static final int MESSAGE_CANT_START_TETHER = 2;
@@ -93,6 +97,28 @@ public class MainActivity extends Activity {
 			}
 		};
 		this.stopBtn.setOnClickListener(this.stopBtnListener);
+		
+		this.ifconfigBtn = (Button)findViewById(R.id.ifconfig);
+	    this.ifconfigBtn.setOnClickListener(new OnClickListener(){
+	    	public void onClick(View v){
+	    		String out = MainActivity.this.application.exec_Ifconfig();
+	    		EditText result = (EditText)findViewById(R.id.result);
+	    		result.setText(out);
+	    	}
+	    	
+	    });
+	    
+	    this.iwconfigBtn = (Button)findViewById(R.id.iwconfig);
+	    this.iwconfigBtn.setOnClickListener(new OnClickListener(){
+	    	public void onClick(View v){
+	    		String out =  MainActivity.this.application.exec_Iwconfig();
+	    		EditText result = (EditText)findViewById(R.id.result);
+	    		result.setText(out);
+	    	}
+	    });
+		
+		
+		
 		
     }
     
