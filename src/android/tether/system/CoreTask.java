@@ -37,7 +37,6 @@ public class CoreTask {
 	public String DATA_FILE_PATH;
 	
 	private static final String FILESET_VERSION = "94";
-	private static final String defaultDNS1 = "208.67.220.220";
 	
 	private Hashtable<String,String> runningProcesses = new Hashtable<String,String>();
 	
@@ -45,60 +44,9 @@ public class CoreTask {
 		this.DATA_FILE_PATH = path;
 	}
 	
-	public class Whitelist {
-		/*
-		 * Maintains the whitelist of allowed MAC addresses.
-		 */
-		public ArrayList<String> whitelist;
-		
-		public Whitelist() {
-			this.whitelist = new ArrayList<String>();
-		}
-		
-		public boolean exists() {
-			File file = new File(DATA_FILE_PATH+"/conf/whitelist_mac.conf");
-			return (file.exists() && file.canRead());
-		}
-		
-		public boolean remove() {
-			File file = new File(DATA_FILE_PATH+"/conf/whitelist_mac.conf");
-			if (file.exists())
-				return file.delete();
-			return false;
-		}
-		
-		public void touch() throws IOException {
-			File file = new File(DATA_FILE_PATH+"/conf/whitelist_mac.conf");
-			file.createNewFile();
-		}
-		
-	    public void save() throws Exception {
-	    	FileOutputStream fos = null;
-	    	File file = new File(DATA_FILE_PATH+"/conf/whitelist_mac.conf");
-	    	try {
-				fos = new FileOutputStream(file);
-				for (String mac : this.whitelist) {
-					fos.write((mac+"\n").getBytes());
-				}
-			} 
-			finally {
-				if (fos != null) {
-					try {
-						fos.close();
-					} catch (IOException e) {
-						// nothing
-					}
-				}
-			}
-	    }
-	    public ArrayList<String> get() {
-	    	return readLinesFromFile(DATA_FILE_PATH+"/conf/whitelist_mac.conf");
-	    }
-	}
-	
 	/*
-	 * A class to handle the wpa supplicant config file.
-	 */
+	* A class to handle the wpa supplicant config file.
+	*/
 	public class WpaSupplicant {
 		
 		public boolean exists() {
@@ -232,124 +180,6 @@ public class CoreTask {
 		}
 	}
 	
-	public class HostapdConfig extends HashMap<String, String> {
-
-		private static final long serialVersionUID = 1L;
-		
-		public HashMap<String, String> read() {
-			String filename = DATA_FILE_PATH + "/conf/hostapd.conf";
-			this.clear();
-			for (String line : readLinesFromFile(filename)) {
-				if (line.startsWith("#"))
-					continue;
-				if (!line.contains("="))
-					continue;
-				String[] data = line.split("=");
-				if (data.length > 1) {
-					this.put(data[0], data[1]);
-				} 
-				else {
-					this.put(data[0], "");
-				}
-			}
-			return this;
-		}
-		
-		public boolean write() {
-			String lines = new String();
-			for (String key : this.keySet()) {
-				lines += key + "=" + this.get(key) + "\n";
-			}
-			return writeLinesToFile(DATA_FILE_PATH + "/conf/hostapd.conf", lines);
-		}
-	}
-	
-	public class DnsmasqConfig {
-		
-		private static final long serialVersionUID = 1L;
-		private String lanconfig;
-		
-		/**
-		 * @param lanconfig - Uses the "number of bits in the routing prefix" to specify the subnet. Example: 192.168.1.0/24
-		 */
-		public void set(String lanconfig) {
-			this.lanconfig = lanconfig;
-		}
-		
-		public boolean write() {
-			String[] lanparts = lanconfig.split("\\.");
-			String iprange = lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".100,"+lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".105,12h";
-	    	StringBuffer buffer = new StringBuffer();;
-	    	ArrayList<String> inputLines = readLinesFromFile(DATA_FILE_PATH+"/conf/dnsmasq.conf");   
-	    	for (String line : inputLines) {
-	    		if (line.contains("dhcp-range")) {
-	    			line = "dhcp-range="+iprange;
-	    		}    		
-	    		buffer.append(line+"\n");
-	    	}
-	    	if (writeLinesToFile(DATA_FILE_PATH+"/conf/dnsmasq.conf", buffer.toString()) == false) {
-	    		Log.e(MSG_TAG, "Unable to update conf/dnsmasq.conf with new lan-configuration.");
-	    		return false;
-	    	}    	
-	    	return true;
-		}
-	}
-	
-	public class BluetoothConfig {
-		
-		private static final long serialVersionUID = 1L;
-		private String lanconfig;
-		
-		/**
-		 * @param lanconfig - Uses the "number of bits in the routing prefix" to specify the subnet. Example: 192.168.1.0/24
-		 */
-		public void set(String lanconfig) {
-			this.lanconfig = lanconfig;
-		}		
-		
-		public boolean write() {
-			String[] lanparts = lanconfig.split("\\.");
-			String gateway = lanparts[0]+"."+lanparts[1]+"."+lanparts[2]+".254";
-			StringBuffer buffer = new StringBuffer();;
-	    	ArrayList<String> inputLines = readLinesFromFile(DATA_FILE_PATH+"/bin/blue-up.sh");   
-	    	for (String line : inputLines) {
-	    		if (line.contains("ifconfig bnep0") && line.endsWith("netmask 255.255.255.0 up >> $tetherlog 2>> $tetherlog")) {
-	    			line = reassembleLine(line, " ", "bnep0", gateway);
-	    		}    		
-	    		buffer.append(line+"\n");
-	    	}
-	    	if (writeLinesToFile(DATA_FILE_PATH+"/bin/blue-up.sh", buffer.toString()) == false) {
-	    		Log.e(MSG_TAG, "Unable to update bin/tether with new lan-configuration.");
-	    		return false;
-	    	}
-	    	return true;
-		}
-	}
-	
-    public Hashtable<String,ClientData> getLeases() throws Exception {
-        Hashtable<String,ClientData> returnHash = new Hashtable<String,ClientData>();
-        
-        ClientData clientData;
-        
-        ArrayList<String> lines = readLinesFromFile(this.DATA_FILE_PATH+"/var/dnsmasq.leases");
-        
-        for (String line : lines) {
-			clientData = new ClientData();
-			String[] data = line.split(" ");
-			Date connectTime = new Date(Long.parseLong(data[0] + "000"));
-			String macAddress = data[1];
-			String ipAddress = data[2];
-			String clientName = data[3];
-			clientData.setConnectTime(connectTime);
-			clientData.setClientName(clientName);
-			clientData.setIpAddress(ipAddress);
-			clientData.setMacAddress(macAddress);
-			clientData.setConnected(true);
-			returnHash.put(macAddress, clientData);
-		}
-    	return returnHash;
-    }
-    
     public boolean chmod(String file, String mode) {
     	if (NativeTask.runCommand("chmod "+ mode + " " + file) == 0) {
     		return true;
@@ -408,52 +238,11 @@ public class CoreTask {
 		return returnStatus;
     }
     
-    public boolean isNatEnabled() {
-    	ArrayList<String> lines = readLinesFromFile("/proc/sys/net/ipv4/ip_forward");
-    	return lines.contains("1");
-    }
-    
     public String getKernelVersion() {
         ArrayList<String> lines = readLinesFromFile("/proc/version");
         String version = lines.get(0).split(" ")[2];
         Log.d(MSG_TAG, "Kernel version: " + version);
         return version;
-    }
-    
-	/*
-	 * This method checks if netfilter/iptables is supported by kernel
-	 */
-    public boolean isNetfilterSupported() {
-    	if ((new File("/proc/config.gz")).exists() == false) {
-	    	if ((new File("/proc/net/netfilter")).exists() == false)
-	    		return false;
-	    	if ((new File("/proc/net/ip_tables_targets")).exists() == false) 
-	    		return false;
-    	}
-    	else {
-            if (!Configuration.hasKernelFeature("CONFIG_NETFILTER=") || 
-                !Configuration.hasKernelFeature("CONFIG_IP_NF_IPTABLES=") ||
-                !Configuration.hasKernelFeature("CONFIG_NF_NAT"))
-            return false;
-    	}
-    	return true;
-    }
-    
-    public boolean isAccessControlSupported() {
-    	if ((new File("/proc/config.gz")).exists() == false) {
-	    	if ((new File("/proc/net/ip_tables_matches")).exists() == false) {
-	    		return false;
-	    	}
-	    	if (Configuration.getDeviceType().equals(Configuration.DEVICE_DROIDX)) {
-	    		return false;
-	    	}
-    	}
-    	else {
-    		if (!Configuration.hasKernelFeature("CONFIG_NETFILTER_XT_MATCH_MAC="))
-    		return false;
-    	}
-    	
-    	return true;
     }
     
     public boolean isProcessRunning(String processName) throws Exception {
@@ -527,74 +316,6 @@ public class CoreTask {
     public String getProp(String property) {
     	return NativeTask.getProp(property);
     }
-    
-    public long[] getDataTraffic(String device) {
-    	// Returns traffic usage for all interfaces starting with 'device'.
-    	long [] dataCount = new long[] {0, 0};
-    	if (device == "")
-    		return dataCount;
-    	for (String line : readLinesFromFile("/proc/net/dev")) {
-    		if (line.startsWith(device) == false)
-    			continue;
-    		line = line.replace(':', ' ');
-    		String[] values = line.split(" +");
-    		dataCount[0] += Long.parseLong(values[1]);
-    		dataCount[1] += Long.parseLong(values[9]);
-    	}
-    	//Log.d(MSG_TAG, "Data rx: " + dataCount[0] + ", tx: " + dataCount[1]);
-    	return dataCount;
-    }
-
-    
-    public synchronized void updateDnsmasqFilepath() {
-    	String dnsmasqConf = this.DATA_FILE_PATH+"/conf/dnsmasq.conf";
-    	String newDnsmasq = new String();
-    	boolean writeconfig = false;
-    	
-    	ArrayList<String> lines = readLinesFromFile(dnsmasqConf);
-    	
-    	for (String line : lines) {
-    		if (line.contains("dhcp-leasefile=") && !line.contains(CoreTask.this.DATA_FILE_PATH)){
-    			line = "dhcp-leasefile="+CoreTask.this.DATA_FILE_PATH+"/var/dnsmasq.leases";
-    			writeconfig = true;
-    		}
-    		else if (line.contains("pid-file=") && !line.contains(CoreTask.this.DATA_FILE_PATH)){
-    			line = "pid-file="+CoreTask.this.DATA_FILE_PATH+"/var/dnsmasq.pid";
-    			writeconfig = true;
-    		}
-    		newDnsmasq += line+"\n";
-    	}
-
-    	if (writeconfig == true)
-    		writeLinesToFile(dnsmasqConf, newDnsmasq);
-    }
-    
-    public synchronized String[] getCurrentDns() {
-    	// Getting dns-servers
-    	String dns[] = new String[2];
-    	dns[0] = getProp("net.dns1");
-    	dns[1] = getProp("net.dns2");
-    	if (dns[0] == null || dns[0].length() <= 0 || dns[0].equals("undefined")) {
-    		dns[0] = defaultDNS1;
-    	}
-    	if (dns[1] == null || dns[1].length() <= 0 || dns[1].equals("undefined")) {
-    		dns[1] = "";
-    	}
-    	return dns;
-    }
-    
-    public synchronized String[] updateResolvConf() {
-    	String resolvConf = this.DATA_FILE_PATH+"/conf/resolv.conf";
-    	// Getting dns-servers
-    	String dns[] = this.getCurrentDns();
-    	String linesToWrite = new String();
-    	linesToWrite = "nameserver "+dns[0]+"\n";
-    	if (dns[1].length() > 0) {
-    		linesToWrite += "nameserver "+dns[1]+"\n";
-    	}
-    	this.writeLinesToFile(resolvConf, linesToWrite);
-    	return dns;
-    }    
     
     public boolean filesetOutdated(){
     	boolean outdated = true;
