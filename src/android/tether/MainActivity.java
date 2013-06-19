@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -32,6 +33,7 @@ public class MainActivity extends Activity {
 	private Button ifconfigBtn = null;
 	private Button iwconfigBtn = null;
 	private Button iwlistBtn = null;
+	private Button settingIpBtn = null;
 	
 	public static final int MESSAGE_CHECK_LOG = 1;
 	public static final int MESSAGE_CANT_START_TETHER = 2;
@@ -116,7 +118,18 @@ public class MainActivity extends Activity {
 	    		result.setText(out);
 	    	}
 	    });
-		
+	    
+	    this.settingIpBtn = (Button)findViewById(R.id.ipAddressSettingButton);
+	    this.settingIpBtn.setOnClickListener(new OnClickListener(){
+	    	public void onClick(View v){
+	    		EditText ipField = (EditText)findViewById(R.id.ipAddressSetting);
+	    		boolean result = MainActivity.this.application.settingIp(ipField.getText().toString());
+	    		if(result)
+	    			Toast.makeText(MainActivity.this, "IPアドレスを["+ipField.getText().toString()+"]に設定", Toast.LENGTH_LONG).show();
+	    		else
+	    			Toast.makeText(MainActivity.this, "IPアドレス設定に失敗", Toast.LENGTH_LONG).show();
+	    	}
+	    });
 		
 		
 		

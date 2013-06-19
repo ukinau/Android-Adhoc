@@ -34,6 +34,7 @@ public class TetherApplication extends Application {
 	
 	public final String DEFAULT_PASSPHRASE = "abcdefghijklm";
 	public final String DEFAULT_LANNETWORK = "192.168.2.0/24";
+	public final String DEFAULT_IPADDRESS = "192.168.2.254"; 
 	public final String DEFAULT_ENCSETUP   = "wpa_supplicant";
 	
 	// Devices-Information
@@ -108,17 +109,19 @@ public class TetherApplication extends Application {
 		String ssid = this.settings.getString("ssidpref", "AndroidTether");
         String txpower = this.settings.getString("txpowerpref", "disabled");
         String lannetwork = this.settings.getString("lannetworkpref", DEFAULT_LANNETWORK);
+        String ipAddress = this.settings.getString("ipAddress", DEFAULT_IPADDRESS);
         String channel = this.settings.getString("channelpref", "1");
+        Log.d(MSG_TAG,"set IP address:"+ipAddress);
         
 		// tether.conf
-        String subnet = lannetwork.substring(0, lannetwork.lastIndexOf("."));
         this.tethercfg.read();
 		this.tethercfg.put("device.type", deviceType);
         this.tethercfg.put("tether.mode", "wifi");
         this.tethercfg.put("wifi.essid", ssid);
         this.tethercfg.put("wifi.channel", channel);
 		this.tethercfg.put("ip.network", lannetwork.split("/")[0]);
-		this.tethercfg.put("ip.gateway", subnet + ".254");    
+		this.tethercfg.put("ip.gateway", ipAddress);    
+		
 		if (Configuration.enableFixPersist()) {
 			this.tethercfg.put("tether.fix.persist", "true");
 		}
@@ -165,6 +168,15 @@ public class TetherApplication extends Application {
 		String out = this.coretask.runRootCommand_getOutput(this.coretask.DATA_FILE_PATH+"/bin/iwconfig");
 		return out;
 	}
+	
+	public boolean settingIp(String ipAddress){
+		String net_interface = this.tethercfg.get("wifi.interface"); 
+		this.preferenceEditor.putString("ipAddress",ipAddress);
+		this.preferenceEditor.commit();
+		boolean result = this.coretask.runRootCommand(this.coretask.DATA_FILE_PATH+"/bin/ifconfig "+net_interface+" "+ipAddress+" netmask 255.255.255.0");
+		return result;
+	}
+
 	
 	// Start/Stop Tethering
     public boolean startTether() {
