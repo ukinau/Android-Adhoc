@@ -176,6 +176,9 @@ public class TetherApplication extends Application {
 		boolean result = this.coretask.runRootCommand(this.coretask.DATA_FILE_PATH+"/bin/ifconfig "+net_interface+" "+ipAddress+" netmask 255.255.255.0");
 		return result;
 	}
+	public String getIpAddress(){
+		return this.settings.getString("ipAddress", DEFAULT_IPADDRESS);
+	}
 
 	
 	// Start/Stop Tethering

@@ -119,6 +119,9 @@ public class MainActivity extends Activity {
 	    	}
 	    });
 	    
+	    EditText ipField = (EditText)findViewById(R.id.ipAddressSetting);
+	    ipField.setText(this.application.getIpAddress());
+	    
 	    this.settingIpBtn = (Button)findViewById(R.id.ipAddressSettingButton);
 	    this.settingIpBtn.setOnClickListener(new OnClickListener(){
 	    	public void onClick(View v){
