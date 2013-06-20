@@ -3,20 +3,20 @@
       package="android.tether"
       android:versionCode="26" android:versionName="2.0.8-pre1 ***EXPERIMENTAL***">
     <uses-sdk android:minSdkVersion="3" />
-    <application android:name="TetherApplication" android:icon="@drawable/icon" android:label="@string/global_application_name">
-        <activity android:name=".MainActivity"
-                  android:label="@string/global_application_name"
-                  android:configChanges="orientation|keyboardHidden"
-                  android:screenOrientation="portrait" 
-                  android:launchMode="singleTask">
+    <application android:name="TetherApplication" android:label="@string/global_application_name">
+        <activity android:name=".TabRootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LogActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
-        <activity android:name=".AccessControlActivity" android:screenOrientation="portrait" android:launchMode="singleTask"/>
-        <activity android:name=".SetupActivity" android:launchMode="singleTask"/>
+        <activity android:name=".SettingActivity"
+                  android:label="@string/global_application_name"
+                  android:configChanges="orientation|keyboardHidden"
+                  android:screenOrientation="portrait" 
+                  android:launchMode="singleTask">
+        </activity>
+        <activity android:name=".CommunicateActivity"></activity>
     </application>
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
 	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>   

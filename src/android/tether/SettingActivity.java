@@ -22,7 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class SettingActivity extends Activity {
 	
 	private TetherApplication application = null;
 
@@ -48,10 +48,10 @@ public class MainActivity extends Activity {
 	public static final int MESSAGE_TRAFFIC_END = 11;
 	
 	public static final String MSG_TAG = "TETHER -> MainActivity";
-	public static MainActivity currentInstance = null;
+	public static SettingActivity currentInstance = null;
 	
-    private static void setCurrent(MainActivity current){
-    	MainActivity.currentInstance = current;
+    private static void setCurrent(SettingActivity current){
+    	SettingActivity.currentInstance = current;
     }
 	
     /** Called when the activity is first created. */
@@ -59,11 +59,11 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
     	Log.d(MSG_TAG, "Calling onCreate()");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.setting_content);
         
         // Init Application
         this.application = (TetherApplication)this.getApplication();
-        MainActivity.setCurrent(this);
+        SettingActivity.setCurrent(this);
         
     	// Check if binaries need to be updated
     	if (this.application.binariesExists() == false || this.application.coretask.filesetOutdated()) {
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
 				Log.d(MSG_TAG, "StartBtn pressed ...");
 				new Thread(new Runnable(){
 					public void run(){
-						boolean started = MainActivity.this.application.startTether();
+						boolean started = SettingActivity.this.application.startTether();
 					}
 				}).start();
 			}
@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
 				Log.d(MSG_TAG, "StopBtn pressed ...");
 				new Thread(new Runnable(){
 					public void run(){
-						MainActivity.this.application.stopTether();
+						SettingActivity.this.application.stopTether();
 					}
 				}).start();
 			}
@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
 		this.ifconfigBtn = (Button)findViewById(R.id.ifconfig);
 	    this.ifconfigBtn.setOnClickListener(new OnClickListener(){
 	    	public void onClick(View v){
-	    		String out = MainActivity.this.application.exec_Ifconfig();
+	    		String out = SettingActivity.this.application.exec_Ifconfig();
 	    		EditText result = (EditText)findViewById(R.id.result);
 	    		result.setText(out);
 	    	}
@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
 	    this.iwconfigBtn = (Button)findViewById(R.id.iwconfig);
 	    this.iwconfigBtn.setOnClickListener(new OnClickListener(){
 	    	public void onClick(View v){
-	    		String out =  MainActivity.this.application.exec_Iwconfig();
+	    		String out =  SettingActivity.this.application.exec_Iwconfig();
 	    		EditText result = (EditText)findViewById(R.id.result);
 	    		result.setText(out);
 	    	}
@@ -126,11 +126,11 @@ public class MainActivity extends Activity {
 	    this.settingIpBtn.setOnClickListener(new OnClickListener(){
 	    	public void onClick(View v){
 	    		EditText ipField = (EditText)findViewById(R.id.ipAddressSetting);
-	    		boolean result = MainActivity.this.application.settingIp(ipField.getText().toString());
+	    		boolean result = SettingActivity.this.application.settingIp(ipField.getText().toString());
 	    		if(result)
-	    			Toast.makeText(MainActivity.this, "IPアドレスを["+ipField.getText().toString()+"]に設定", Toast.LENGTH_LONG).show();
+	    			Toast.makeText(SettingActivity.this, "IPアドレスを["+ipField.getText().toString()+"]に設定", Toast.LENGTH_LONG).show();
 	    		else
-	    			Toast.makeText(MainActivity.this, "IPアドレス設定に失敗", Toast.LENGTH_LONG).show();
+	    			Toast.makeText(SettingActivity.this, "IPアドレス設定に失敗", Toast.LENGTH_LONG).show();
 	    	}
 	    });
 		

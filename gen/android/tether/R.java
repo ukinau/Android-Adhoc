@@ -25,20 +25,10 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int background=0x7f020000;
-        public static final int battery=0x7f020001;
-        public static final int bluetooth=0x7f020002;
-        public static final int icon=0x7f020003;
-        public static final int lock=0x7f020004;
-        public static final int lock_open=0x7f020005;
-        public static final int lockcheckbox=0x7f020006;
-        public static final int sechigh=0x7f020007;
-        public static final int seclow=0x7f020008;
-        public static final int secmedium=0x7f020009;
-        public static final int start=0x7f02000a;
-        public static final int start_notification=0x7f02000b;
-        public static final int stop=0x7f02000c;
-        public static final int wifi=0x7f02000d;
+        public static final int chat=0x7f020000;
+        public static final int communicate_tab=0x7f020001;
+        public static final int setting=0x7f020002;
+        public static final int setting_tab=0x7f020003;
     }
     public static final class id {
         public static final int ifconfig=0x7f070004;
@@ -51,7 +41,8 @@ public final class R {
         public static final int stopTetherBtn=0x7f070001;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
+        public static final int setting_content=0x7f030000;
+        public static final int tab_host=0x7f030001;
     }
     public static final class raw {
         public static final int ifconfig=0x7f040000;
