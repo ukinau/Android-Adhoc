@@ -8,9 +8,7 @@ public class DtnActivity extends Activity {
 	
 	public void onCreate(Bundle savedInstanced){
 		super.onCreate(savedInstanced);
-	    TextView view = new TextView(this);
-	    view.setText("communicate");
-		setContentView(view);
+		setContentView(R.layout.dtn_content);
 	}
 
 }

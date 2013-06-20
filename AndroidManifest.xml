@@ -3,7 +3,8 @@
       package="android.tether"
       android:versionCode="26" android:versionName="2.0.8-pre1 ***EXPERIMENTAL***">
     <uses-sdk android:minSdkVersion="3" />
-    <application android:name="TetherApplication" android:label="@string/global_application_name">
+    <application android:name="TetherApplication" android:label="@string/global_application_name" 
+        android:theme="@android:style/Theme.NoTitleBar">
         <activity android:name=".TabRootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
