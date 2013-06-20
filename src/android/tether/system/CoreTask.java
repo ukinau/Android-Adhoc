@@ -274,7 +274,7 @@ public class CoreTask {
         int ret;
         try {
         		command = "su -c "+command;
-        		Log.d(MSG_TAG, command);
+        		Log.d(MSG_TAG, "Run root-command:"+command);
                 process = runtime.exec(command);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(
                                 process.getInputStream()),8192);
@@ -286,7 +286,7 @@ public class CoreTask {
                 ret =  process.waitFor();
                 if(ret != 0){
                 	command = "su -c '"+commandRaw+" '";
-                	Log.d(MSG_TAG, command);
+                	Log.d(MSG_TAG, "Run root-command:"+command);
                 	process = runtime.exec(command);
                     reader = new BufferedReader(new InputStreamReader(
                                     process.getErrorStream()),8192);
@@ -311,7 +311,7 @@ public class CoreTask {
         Process process;
         String output = "";
         try {
-               	Log.d(MSG_TAG, command);
+               	Log.d(MSG_TAG, "Run command: "+command);
                 process = runtime.exec(command);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(
                                 process.getInputStream()),8192);
