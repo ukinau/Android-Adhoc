@@ -55,7 +55,11 @@ public class CommunicateActivity extends Activity {
 			public void onClick(View v) {
 				EditText msgForm = (EditText) findViewById(R.id.message_form);
 				String msg = msgForm.getText().toString();				
-				String subnet = "192.168.2";
+				String ipAddress = CommunicateActivity.this.application.getIpAddress_fromIfconfig(); 
+				int lastIpNumberPoint = ipAddress.lastIndexOf(".");
+				String lastIp = ipAddress.substring(lastIpNumberPoint);
+				String subnet = ipAddress.split(lastIp)[0];
+				Log.d(MSG_TAG,subnet);
 				try {
 					new UdpSendThread(subnet+".255", 
 							AndroidTetherConstants.CHAT_UDP_RECEIVE_PORT, msg, true).start();
