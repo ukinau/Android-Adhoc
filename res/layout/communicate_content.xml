@@ -1,0 +1,98 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    
+    <TextView android:id="@+id/connection_status_label"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="接続状態：" 
+	        android:layout_marginTop="20dp"
+	        android:layout_alignParentLeft="true" />
+    
+    <TextView android:id="@+id/connection_status"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="未接続" 
+	        android:layout_marginTop="20dp"
+	        android:layout_toRightOf="@id/connection_status_label" />
+    
+		
+	<View android:id="@+id/connection_status_label_border"
+		   android:layout_width="fill_parent"
+		   android:layout_height="2dp"       
+		   android:background="#000000"
+		   android:layout_alignParentLeft="true"
+		   android:layout_below="@id/connection_status_label" />
+	
+						
+						
+						
+						<TextView android:id="@+id/message_form_label"
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:text="メッセージ内容" 
+					        android:layout_marginLeft="8dp"
+					        android:layout_marginRight="8dp"
+					        android:layout_alignLeft="@id/connection_status_label_border"
+					        android:layout_below="@id/connection_status_label_border" />
+					   
+								<EditText
+							        android:id="@+id/message_form"
+							        android:layout_width="match_parent"
+							        android:layout_height="wrap_content"
+							        android:ems="10" 
+							        android:layout_marginLeft="8dp"
+							        android:layout_marginRight="8dp"
+							        android:layout_alignLeft="@id/message_form_label"
+							        android:layout_below="@id/message_form_label">
+							    </EditText>
+					    
+						<TextView android:id="@+id/distination_ip_label"
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:text="宛先IP" 
+					        android:layout_marginLeft="20dp"
+					        android:layout_marginRight="8dp"
+					        android:layout_alignLeft="@id/message_form"
+					        android:layout_below="@id/message_form" />
+					    
+								<EditText
+							        android:id="@+id/distination_ip_form"
+							        android:layout_width="match_parent"
+							        android:layout_height="wrap_content"
+							        android:ems="10" 
+							        android:layout_marginLeft="8dp"
+							        android:layout_marginRight="8dp"
+							        android:layout_alignLeft="@id/distination_ip_label"
+							        android:layout_below="@id/distination_ip_label">
+							    </EditText>
+							    
+						<Button 
+						     android:id="@+id/tcpSendButton"
+					         android:layout_width="wrap_content"
+					         android:layout_height="wrap_content"
+				 	         android:layout_marginRight="20dp"
+				 	         android:layout_marginLeft="10dp"
+					         android:text="TCP送信" 
+					         android:layout_alignLeft="@id/distination_ip_form"
+					         android:layout_below="@id/distination_ip_form"/>
+						    
+					    
+						<Button
+					         android:id="@+id/broadCastButton"
+					         android:layout_width="wrap_content"
+					         android:layout_height="wrap_content"
+					         android:text="BroadCast" 
+						   	 android:layout_toRightOf="@id/tcpSendButton"
+						   	 android:layout_below="@id/distination_ip_form" />
+
+						<ListView
+						    android:id="@+id/message_box_listView"
+						    android:layout_width="match_parent"
+						    android:layout_height="fill_parent"
+						    android:layout_alignParentLeft="true"
+						    android:layout_below="@+id/tcpSendButton"
+						    android:layout_weight="1" >
+						</ListView>
+
+</RelativeLayout>
