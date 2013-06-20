@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
+import android.tether.system.AndroidTetherCommon;
 import android.tether.system.Configuration;
 import android.tether.system.CoreTask;
 import android.util.Log;
@@ -163,10 +164,33 @@ public class TetherApplication extends Application {
 		return out;
 	}
 	
+	public String getIpAddress_fromIfconfig(){
+		String output = exec_Ifconfig();
+		return AndroidTetherCommon.extractMatchString("ip (.*) mask", output);
+	}
+	
 	public String exec_Iwconfig(){
 		// Return the value of active interface , the other value of not active output as error-stream 
 		String out = this.coretask.runRootCommand_getOutput(this.coretask.DATA_FILE_PATH+"/bin/iwconfig");
 		return out;
+	}
+	
+	public String getWirelessStatus_fromIwconfig(){
+		String output = exec_Iwconfig();
+		String result = "";
+		String ssid = AndroidTetherCommon.extractMatchString("ESSID:\"(.*)\" ", output);
+		String mode = AndroidTetherCommon.extractMatchString("Mode:(.*) F", output);
+		String cell = AndroidTetherCommon.extractMatchString("Cell: (.*)", output);
+		String accessPoint = AndroidTetherCommon.extractMatchString("Access Point: (.*)", output);
+		result += "ssid:"+ssid+"( "+mode+")\n";//cell:"+cell;
+		if(cell != null){
+			result += "cell:"+cell;
+		}
+		if(accessPoint != null){
+			result += "AccessPoint:"+accessPoint;
+		}
+		result = (ssid!=null & mode!=null)? result:null;
+		return result;
 	}
 	
 	public boolean settingIp(String ipAddress){
@@ -368,5 +392,4 @@ public class TetherApplication extends Application {
         return version;
     }
 
-    
 }

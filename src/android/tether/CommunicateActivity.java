@@ -17,15 +17,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class CommunicateActivity extends Activity {
 	
 	public static final String MSG_TAG = "TETHER -> CommunicateAcitivity";
-
+	private TetherApplication application;
 	private ArrayAdapter<String> messageBoxAdapter;
 	private UdpReceiveThread chatUdpReceiver=null;
 	private TcpHandleConnectionThread chatHandleTcpConnectionThread=null;
+	
 	
 	// to deal with UI by other thread
 	private final Handler  messageBoxListHandler=new Handler() {
@@ -44,7 +46,8 @@ public class CommunicateActivity extends Activity {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.communicate_content);
 	    Log.d(MSG_TAG,"onCreate");
-
+		// Init Application
+        this.application = (TetherApplication)this.getApplication();
 	    
 	    // Register the event of inner content 
      	Button broadCastButton = (Button) findViewById(R.id.broadCastButton);
@@ -90,7 +93,8 @@ public class CommunicateActivity extends Activity {
 	  public void onResume(){
 		super.onResume();
      	Log.d(MSG_TAG,"onResume");
-		ListView messageBoxList = (ListView)findViewById(R.id.message_box_listView);
+     	reflectStatus();
+     	ListView messageBoxList = (ListView)findViewById(R.id.message_box_listView);
 	   	messageBoxAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 	   	messageBoxList.setAdapter(this.messageBoxAdapter);
 		
@@ -138,6 +142,24 @@ public class CommunicateActivity extends Activity {
 	  public void onDestory(){
 		  super.onDestroy();
 		  Log.d(MSG_TAG,"onDestroy");
+	  }
+	  
+	  public void reflectStatus(){
+		 String status = "";
+	     String ipAddress = this.application.getIpAddress_fromIfconfig();
+	     String wirelessStatus = this.application.getWirelessStatus_fromIwconfig();
+	     TextView statusLabel = (TextView)findViewById(R.id.connection_status);
+	     if(ipAddress != null){
+	     	status += "IP:"+ipAddress+"\n";
+	     }
+	     if(wirelessStatus  != null){
+	     	status += wirelessStatus;
+	     }
+	     if(status.length() == 0){
+	     	status = "未接続";
+	     }
+	     statusLabel.setText(status);
+	     Log.d(MSG_TAG,status);
 	  }
 	
 }
