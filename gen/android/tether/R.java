@@ -31,31 +31,39 @@ public final class R {
         public static final int dtn_tab=0x7f020003;
         public static final int setting=0x7f020004;
         public static final int setting_tab=0x7f020005;
+        public static final int start_button=0x7f020006;
+        public static final int start_button_hover=0x7f020007;
+        public static final int start_button_pressed=0x7f020008;
+        public static final int start_button_raw=0x7f020009;
+        public static final int stop_button=0x7f02000a;
+        public static final int stop_button_hover=0x7f02000b;
+        public static final int stop_button_pressed=0x7f02000c;
+        public static final int stop_button_raw=0x7f02000d;
     }
     public static final class id {
-        public static final int broadCastButton=0x7f070008;
-        public static final int connection_status=0x7f070001;
-        public static final int connection_status_label=0x7f070000;
-        public static final int connection_status_label_border=0x7f070002;
-        public static final int distination_ip_form=0x7f070006;
-        public static final int distination_ip_label=0x7f070005;
-        public static final int ifconfig=0x7f070013;
-        public static final int ipAddressSetting=0x7f070011;
-        public static final int ipAddressSettingButton=0x7f070012;
-        public static final int iwconfig=0x7f070014;
-        public static final int iwlist=0x7f070015;
-        public static final int messageList=0x7f07000e;
-        public static final int message_box_listView=0x7f070009;
-        public static final int message_form=0x7f070004;
-        public static final int message_form_label=0x7f070003;
-        public static final int result=0x7f070016;
-        public static final int setTargetText=0x7f07000c;
-        public static final int startTetherBtn=0x7f07000f;
-        public static final int stopTetherBtn=0x7f070010;
-        public static final int targetText_form=0x7f07000b;
-        public static final int targetText_label=0x7f07000a;
-        public static final int targetText_label_border=0x7f07000d;
-        public static final int tcpSendButton=0x7f070007;
+        public static final int broadCastButton=0x7f080008;
+        public static final int connection_status=0x7f080001;
+        public static final int connection_status_label=0x7f080000;
+        public static final int connection_status_label_border=0x7f080002;
+        public static final int distination_ip_form=0x7f080006;
+        public static final int distination_ip_label=0x7f080005;
+        public static final int ifconfig=0x7f080013;
+        public static final int ipAddressSetting=0x7f080011;
+        public static final int ipAddressSettingButton=0x7f080012;
+        public static final int iwconfig=0x7f080014;
+        public static final int iwlist=0x7f080015;
+        public static final int messageList=0x7f08000e;
+        public static final int message_box_listView=0x7f080009;
+        public static final int message_form=0x7f080004;
+        public static final int message_form_label=0x7f080003;
+        public static final int result=0x7f080016;
+        public static final int setTargetText=0x7f08000c;
+        public static final int startTetherBtn=0x7f08000f;
+        public static final int stopTetherBtn=0x7f080010;
+        public static final int targetText_form=0x7f08000b;
+        public static final int targetText_label=0x7f08000a;
+        public static final int targetText_label_border=0x7f08000d;
+        public static final int tcpSendButton=0x7f080007;
     }
     public static final class layout {
         public static final int communicate_content=0x7f030000;
@@ -235,5 +243,9 @@ public final class R {
         public static final int txpower_warning_line2=0x7f05009c;
         public static final int update_layout_line1=0x7f050097;
         public static final int update_layout_line2=0x7f050098;
+    }
+    public static final class style {
+        public static final int start_button=0x7f070000;
+        public static final int stop_button=0x7f070001;
     }
 }

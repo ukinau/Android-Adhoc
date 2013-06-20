@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="start_button">
+        <item name="android:background">@drawable/start_button_raw</item>
+    </style>
+    <style name="stop_button">
+        <item name="android:background">@drawable/stop_button_raw</item>
+    </style>
+</resources>

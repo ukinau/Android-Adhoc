@@ -10,16 +10,21 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
         
-        <Button
-	        android:layout_width="wrap_content"
+        <ImageButton 
+            android:id="@+id/startTetherBtn"
+            android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:id="@+id/startTetherBtn"
-	        android:text="start" />
-	    <Button 
-	        android:layout_width="wrap_content"
+	        style="@style/start_button"
+	        android:layout_marginRight="5px"
+	         />
+        
+        <ImageButton 
+            android:id="@+id/stopTetherBtn"
+            android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:id="@+id/stopTetherBtn"
-	        android:text="stop" />
+	        style="@style/stop_button"
+	        android:layout_marginRight="5px"
+	         />
         
     </LinearLayout>
    
@@ -27,7 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5px"
-        android:text="IPアドレス設定" />
+        android:text="IPアドレス設定" 
+        android:textColor="#000000"/>
         
     <EditText
         android:id="@+id/ipAddressSetting"

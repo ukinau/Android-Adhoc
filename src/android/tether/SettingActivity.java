@@ -20,15 +20,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class SettingActivity extends Activity {
 	
 	private TetherApplication application = null;
 
-	private Button startBtn = null;
+	private ImageButton startBtn = null;
 	private OnClickListener startBtnListener = null;
-	private Button stopBtn = null;
+	private ImageButton stopBtn = null;
 	private OnClickListener stopBtnListener = null;
 	private Button ifconfigBtn = null;
 	private Button iwconfigBtn = null;
@@ -73,7 +74,7 @@ public class SettingActivity extends Activity {
         }
         
         // Start Button
-        this.startBtn = (Button)findViewById(R.id.startTetherBtn);
+        this.startBtn = (ImageButton)findViewById(R.id.startTetherBtn);
         this.startBtnListener = new OnClickListener() {
 			public void onClick(View v) {
 				Log.d(MSG_TAG, "StartBtn pressed ...");
@@ -87,7 +88,7 @@ public class SettingActivity extends Activity {
 		this.startBtn.setOnClickListener(this.startBtnListener);
 
 		// Stop Button
-		this.stopBtn = (Button) findViewById(R.id.stopTetherBtn);
+		this.stopBtn = (ImageButton) findViewById(R.id.stopTetherBtn);
 		this.stopBtnListener = new OnClickListener() {
 			public void onClick(View v) {
 				Log.d(MSG_TAG, "StopBtn pressed ...");
