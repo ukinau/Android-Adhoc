@@ -27,8 +27,10 @@ public final class R {
     public static final class drawable {
         public static final int chat=0x7f020000;
         public static final int communicate_tab=0x7f020001;
-        public static final int setting=0x7f020002;
-        public static final int setting_tab=0x7f020003;
+        public static final int dtn=0x7f020002;
+        public static final int dtn_tab=0x7f020003;
+        public static final int setting=0x7f020004;
+        public static final int setting_tab=0x7f020005;
     }
     public static final class id {
         public static final int broadCastButton=0x7f070008;

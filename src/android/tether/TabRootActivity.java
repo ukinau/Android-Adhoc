@@ -1,6 +1,5 @@
 package android.tether;
 
-import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -33,6 +32,13 @@ public class TabRootActivity extends TabActivity {
 	     spec = tabHost.newTabSpec("Tab2").setIndicator(
 	       "", res.getDrawable(R.drawable.communicate_tab))
 	       .setContent(intent);
+	     tabHost.addTab(spec);
+	     
+	    // DtnActivity
+	     intent = new Intent().setClass(this, DtnActivity.class);
+	     spec = tabHost.newTabSpec("Tab3").setIndicator(
+	    		 "", res.getDrawable(R.drawable.dtn_tab))
+	    		 .setContent(intent);
 	     tabHost.addTab(spec);
 	      
 	}
