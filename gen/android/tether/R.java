@@ -29,16 +29,18 @@ public final class R {
         public static final int communicate_tab=0x7f020001;
         public static final int dtn=0x7f020002;
         public static final int dtn_tab=0x7f020003;
-        public static final int setting=0x7f020004;
-        public static final int setting_tab=0x7f020005;
-        public static final int start_button=0x7f020006;
-        public static final int start_button_hover=0x7f020007;
-        public static final int start_button_pressed=0x7f020008;
-        public static final int start_button_raw=0x7f020009;
-        public static final int stop_button=0x7f02000a;
-        public static final int stop_button_hover=0x7f02000b;
-        public static final int stop_button_pressed=0x7f02000c;
-        public static final int stop_button_raw=0x7f02000d;
+        public static final int logo=0x7f020004;
+        public static final int logo_background=0x7f020005;
+        public static final int setting=0x7f020006;
+        public static final int setting_tab=0x7f020007;
+        public static final int start_button=0x7f020008;
+        public static final int start_button_hover=0x7f020009;
+        public static final int start_button_pressed=0x7f02000a;
+        public static final int start_button_raw=0x7f02000b;
+        public static final int stop_button=0x7f02000c;
+        public static final int stop_button_hover=0x7f02000d;
+        public static final int stop_button_pressed=0x7f02000e;
+        public static final int stop_button_raw=0x7f02000f;
     }
     public static final class id {
         public static final int broadCastButton=0x7f080008;

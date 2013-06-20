@@ -11,10 +11,38 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+    <LinearLayout 
+        android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="35dip"
+    	android:background="@drawable/logo_background"
+    >
+    	<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="5dip"
+		    android:textSize="24dip"
+		    android:textColor="#000000"
+		    android:text="DTN" />
+        
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo" />
+		<TextView
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:textSize="24dip"
+		    android:textColor="#000000"
+		    android:text="Application" />
+        
+    </LinearLayout>
     <TabWidget
       android:id="@android:id/tabs"
       android:layout_width="fill_parent"
-      android:layout_height="50px"/>
+      android:layout_height="40dip"
+      />
     
     <FrameLayout
       android:id="@android:id/tabcontent"
