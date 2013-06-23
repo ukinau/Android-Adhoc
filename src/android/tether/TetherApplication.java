@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 import android.app.Application;
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
+import android.tether.dtn.DtnMessage;
 import android.tether.system.AndroidTetherCommon;
 import android.tether.system.Configuration;
 import android.tether.system.CoreTask;
@@ -57,9 +59,10 @@ public class TetherApplication extends Application {
 	public CoreTask.WpaSupplicant wpasupplicant = null;
 	// tether.conf
 	public CoreTask.TetherConfig tethercfg = null;
-	
 	// CoreTask
 	public CoreTask coretask = null;
+	
+	public ArrayList<DtnMessage> dtnMsgs = null;
 	
 	@Override
 	public void onCreate() {
@@ -92,6 +95,8 @@ public class TetherApplication extends Application {
         // tether.cfg
         this.tethercfg = this.coretask.new TetherConfig();
         this.tethercfg.read();
+        
+        this.dtnMsgs = new ArrayList<DtnMessage>();
 
 	}
 
