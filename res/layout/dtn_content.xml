@@ -3,13 +3,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context=".DtnActivity" >
+    tools:context=".DtnActivity"
+    android:background="#f0f8ff" >
 
     <TextView
         android:id="@+id/targetText_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Target Information" />
+        android:text="Target Information"
+        android:textColor="#000000" />
 	<EditText 
 	    android:id="@+id/targetText_form"
 	    android:layout_width="fill_parent"
@@ -35,8 +37,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="受信メッセージ"
+        android:textColor="#000000"
         />
-		  
+	 <ListView
+	    android:id="@+id/message_box_listView"
+	    android:layout_width="match_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_alignParentLeft="true"
+	    android:layout_below="@+id/tcpSendButton"
+	    android:layout_weight="1"
+	    android:background="#000000" >
+	</ListView>
     
     
 </LinearLayout>

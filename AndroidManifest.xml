@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="android.tether"
       android:versionCode="26" android:versionName="2.0.8-pre1 ***EXPERIMENTAL***">
-    <uses-sdk android:minSdkVersion="3" />
+    <uses-sdk android:minSdkVersion="8" />
     <application android:name="TetherApplication" android:label="@string/global_application_name" 
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity android:name=".TabRootActivity">
