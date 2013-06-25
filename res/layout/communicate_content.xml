@@ -99,7 +99,9 @@
 						    android:layout_height="fill_parent"
 						    android:layout_alignParentLeft="true"
 						    android:layout_below="@+id/tcpSendButton"
-						    android:layout_weight="1" >
+						    android:layout_weight="1"
+						    android:background="#000000">
+						    
 						</ListView>
 
 </RelativeLayout>
