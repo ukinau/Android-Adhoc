@@ -35,6 +35,7 @@ public class SettingActivity extends Activity {
 	private Button iwconfigBtn = null;
 	private Button iwlistBtn = null;
 	private Button settingIpBtn = null;
+	private Button getMacAddressBtn = null;
 	
 	public static final int MESSAGE_CHECK_LOG = 1;
 	public static final int MESSAGE_CANT_START_TETHER = 2;
@@ -128,6 +129,15 @@ public class SettingActivity extends Activity {
 	    		result.setText(out);
 	    	}
 	    });
+	    this.getMacAddressBtn = (Button)findViewById(R.id.getMacAddress);
+	    this.getMacAddressBtn.setOnClickListener(new OnClickListener(){
+	    	public void onClick(View v){
+	    		String out = SettingActivity.this.application.getMacAddress();
+	    		EditText result = (EditText)findViewById(R.id.result);
+	    		result.setText(out);
+	    	}
+	  	});
+	    
 	    
 	    EditText ipField = (EditText)findViewById(R.id.ipAddressSetting);
 	    ipField.setText(this.application.getIpAddress());

@@ -198,6 +198,24 @@ public class TetherApplication extends Application {
 		return result;
 	}
 	
+	public String getMacAddress(){
+		if(this.settings.contains("MacAddress")){
+			return this.settings.getString("MacAddress",null);
+		}
+		else{
+			String macAddress = getMacAddress_fromBusyBox_ifconfig();
+			this.preferenceEditor.putString("MacAddress", macAddress);
+			this.preferenceEditor.commit();
+			return macAddress;
+		}
+	}
+	public String getMacAddress_fromBusyBox_ifconfig(){
+		String net_interface = this.tethercfg.get("wifi.interface"); 
+		String output =  this.coretask.runCommand("busybox ifconfig " + net_interface);
+		String macAddress = AndroidTetherCommon.extractMatchString("HWaddr (.*)", output);
+		return macAddress;
+	}
+	
 	public String excec_Iwlist(){
 		String out = this.coretask.runRootCommand_getOutput(this.coretask.DATA_FILE_PATH+"/bin/iwlist scan");
 		return out;

@@ -49,6 +49,7 @@ public final class R {
         public static final int connection_status_label_border=0x7f080002;
         public static final int distination_ip_form=0x7f080006;
         public static final int distination_ip_label=0x7f080005;
+        public static final int getMacAddress=0x7f080016;
         public static final int ifconfig=0x7f080013;
         public static final int ipAddressSetting=0x7f080011;
         public static final int ipAddressSettingButton=0x7f080012;
@@ -58,7 +59,7 @@ public final class R {
         public static final int message_box_listView=0x7f080009;
         public static final int message_form=0x7f080004;
         public static final int message_form_label=0x7f080003;
-        public static final int result=0x7f080016;
+        public static final int result=0x7f080017;
         public static final int setTargetText=0x7f08000c;
         public static final int startTetherBtn=0x7f08000f;
         public static final int stopTetherBtn=0x7f080010;
