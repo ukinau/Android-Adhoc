@@ -184,10 +184,10 @@ public class TetherApplication extends Application {
 		String output = exec_Iwconfig();
 		String result = "";
 		String ssid = AndroidTetherCommon.extractMatchString("ESSID:\"(.*)\" ", output);
-		String mode = AndroidTetherCommon.extractMatchString("Mode:(.*) F", output);
+		String mode = AndroidTetherCommon.extractMatchString("Mode:(.*?) F", output);
 		String cell = AndroidTetherCommon.extractMatchString("Cell: (.*)", output);
 		String accessPoint = AndroidTetherCommon.extractMatchString("Access Point: (.*)", output);
-		result += "ssid:"+ssid+"( "+mode+")\n";//cell:"+cell;
+		result += "ssid:"+ssid+"("+mode+")\n";//cell:"+cell;
 		if(cell != null){
 			result += "cell:"+cell;
 		}
