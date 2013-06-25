@@ -63,6 +63,7 @@ public class TetherApplication extends Application {
 	public CoreTask coretask = null;
 	
 	public ArrayList<DtnMessage> dtnMsgs = null;
+	public ArrayList<String> knownIpAddress = null;
 	
 	@Override
 	public void onCreate() {
