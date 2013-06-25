@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.tether.CommunicateActivity;
+import android.tether.dtn.ReceivedBehaver;
 import android.tether.system.AndroidTetherConstants;
 import android.util.Log;
 
@@ -17,25 +18,36 @@ public class TcpServerThread extends Thread{
     private SocketAddress clientAddress;
 	private String endString="¥0¥0";
     private Handler handler;
+    private ReceivedBehaver behaver;
     
 	public TcpServerThread(Socket sock, Handler handler){
 		this.sock = sock;
 		this.clientAddress = sock.getRemoteSocketAddress();
 		this.handler = handler;
 	}
+	public TcpServerThread(Socket sock, ReceivedBehaver behaver){
+		this.sock = sock;
+		this.clientAddress = sock.getRemoteSocketAddress();
+		this.behaver = behaver;
+	}
 	
 	@Override
 	public void run(){
 		String res = receive();
-		// reflect the result received
-		Message msg = new Message();
-		Bundle data=new Bundle();
-		data.putString("msg", res);
-		data.putString("protocol", "TCP" );
-		msg.setData(data);
-		handler.sendMessage(msg);
-    	System.out.print(res.length());
-
+		
+		if(this.handler != null){
+			// reflect the result received
+			Message msg = new Message();
+			Bundle data=new Bundle();
+			data.putString("msg", res);
+			data.putString("protocol", "TCP" );
+			msg.setData(data);
+			handler.sendMessage(msg);
+			System.out.print(res.length());
+		}
+		if(this.behaver != null){
+			behaver.after_packet_received("","");
+		}
 		try {
 			this.sock.close();
 		} catch (IOException e) {
