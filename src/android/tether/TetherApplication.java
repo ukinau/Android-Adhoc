@@ -198,6 +198,11 @@ public class TetherApplication extends Application {
 		return result;
 	}
 	
+	public String excec_Iwlist(){
+		String out = this.coretask.runRootCommand_getOutput(this.coretask.DATA_FILE_PATH+"/bin/iwlist scan");
+		return out;
+	}
+	
 	public boolean settingIp(String ipAddress){
 		String net_interface = this.tethercfg.get("wifi.interface"); 
 		this.preferenceEditor.putString("ipAddress",ipAddress);
@@ -305,6 +310,10 @@ public class TetherApplication extends Application {
 		    	// iwconfig
 		    	if (message == null) {
 			    	message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/iwconfig", "0755", R.raw.iwconfig);
+		    	}
+		    	// iwlist
+		    	if (message == null) {
+		    		message = TetherApplication.this.copyFile(TetherApplication.this.coretask.DATA_FILE_PATH+"/bin/iwlist", "0755", R.raw.iwlist);
 		    	}
 				
 				// edify script

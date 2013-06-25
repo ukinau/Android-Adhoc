@@ -270,33 +270,18 @@ public class CoreTask {
     	Runtime runtime = Runtime.getRuntime();
         Process process;
         String output = "";
-        String commandRaw = command;
-        int ret;
         try {
-        		command = "su -c "+command;
-        		Log.d(MSG_TAG, "Run root-command:"+command);
-                process = runtime.exec(command);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
+             Log.d(MSG_TAG, "Run root-command:"+command);
+             process = runtime.exec(new String[]{"su","-c",command});
+             BufferedReader reader = new BufferedReader(new InputStreamReader(
                                 process.getInputStream()),8192);
-                String line;
-                while ((line = reader.readLine()) != null) {
-                        output += line + "\n";
-                }
-                reader.close();
-                ret =  process.waitFor();
-                if(ret != 0){
-                	command = "su -c '"+commandRaw+" '";
-                	Log.d(MSG_TAG, "Run root-command:"+command);
-                	process = runtime.exec(command);
-                    reader = new BufferedReader(new InputStreamReader(
-                                    process.getErrorStream()),8192);
-                    output = "";
-                    while ((line = reader.readLine()) != null) {
-                            output += line + "\n";
-                    }
-                    reader.close();
-                    ret =  process.waitFor();
-                }
+             output = "";
+             String line;
+             while ((line = reader.readLine()) != null) {
+                     output += line + "\n";
+             }
+             reader.close();
+             process.waitFor();
         } catch (IOException e) {
                 e.printStackTrace();
 

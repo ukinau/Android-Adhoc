@@ -120,6 +120,15 @@ public class SettingActivity extends Activity {
 	    	}
 	    });
 	    
+	    this.iwlistBtn = (Button)findViewById(R.id.iwlist);
+	    this.iwlistBtn.setOnClickListener(new OnClickListener(){
+	    	public void onClick(View v){
+	    		String out = SettingActivity.this.application.excec_Iwlist();
+	    		EditText result = (EditText)findViewById(R.id.result);
+	    		result.setText(out);
+	    	}
+	    });
+	    
 	    EditText ipField = (EditText)findViewById(R.id.ipAddressSetting);
 	    ipField.setText(this.application.getIpAddress());
 	    
