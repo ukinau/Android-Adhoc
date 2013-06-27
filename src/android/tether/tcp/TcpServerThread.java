@@ -33,8 +33,10 @@ public class TcpServerThread extends Thread{
 	
 	@Override
 	public void run(){
-		String res = receive();
 		
+		String []recvInfo = receive();
+		String res = recvInfo[0];
+		String ipAddress = recvInfo[1];
 		if(this.handler != null){
 			// reflect the result received
 			Message msg = new Message();
@@ -46,7 +48,7 @@ public class TcpServerThread extends Thread{
 			System.out.print(res.length());
 		}
 		if(this.behaver != null){
-			behaver.after_packet_received("","");
+			behaver.after_packet_received(ipAddress,res);
 		}
 		try {
 			this.sock.close();
@@ -55,7 +57,7 @@ public class TcpServerThread extends Thread{
 		}
 	}
 	
-	private String receive(){
+	private String receiveString(){
     	byte []receiveBuf = new byte[AndroidTetherConstants.TCP_BUFFER_SIZE]; // 受信バッファ
 		int recvMsgSize; // 受信メッセージサイズ
 		String recvMsg=null;
@@ -69,6 +71,24 @@ public class TcpServerThread extends Thread{
 			e.printStackTrace();
 		}
 		return recvMsg;
+	}
+	private String[] receive(){
+		byte []receiveBuf = new byte[AndroidTetherConstants.TCP_BUFFER_SIZE]; // 受信バッファ
+		int recvMsgSize; // 受信メッセージサイズ
+		String []recvInfo = new String[2];
+		try {
+			InputStream in = this.sock.getInputStream();
+			recvMsgSize = in.read(receiveBuf);
+			String recvMsg;
+			recvMsg = new String(receiveBuf , 0 , recvMsgSize);
+			recvMsg = recvMsg.split(endString)[0]; //終端文字以降切り捨て
+			recvInfo[0] = recvMsg;
+			recvInfo[1] = this.clientAddress.toString();
+			in.close();
+    	} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return recvInfo;	
 	}
 
 }

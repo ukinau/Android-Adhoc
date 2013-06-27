@@ -42,7 +42,9 @@ public class UdpReceiveThread extends Thread {
 	public void run(){
 		while(socketOpen){
 			try{
-				String res = receive();
+				String []receiveInfo = receive();
+				String res = receiveInfo[0];
+				String ipAddress = receiveInfo[1];
 				
 				if(this.handler != null){
 					// reflect the result received
@@ -54,7 +56,7 @@ public class UdpReceiveThread extends Thread {
 					handler.sendMessage(msg);
 				}
 				if(this.behaver != null){
-					behaver.after_packet_received("","");
+					behaver.after_packet_received(ipAddress,res);
 				}
 				
 			}catch(Exception e){
@@ -69,15 +71,27 @@ public class UdpReceiveThread extends Thread {
 		//this.stop(); this method cause Runtime Exception
 	}
 	
-	private String receive() throws Exception{
+	private String receiveString() throws Exception{
 		byte []buf = new byte[AndroidTetherConstants.UDP_BUFFER_SIZE];
 		DatagramPacket packet= new DatagramPacket(buf,buf.length);
 		recSocket.receive(packet);//receive & wait
-		SocketAddress macAddress = packet.getSocketAddress();
-		macAddress.toString();
 		int len = packet.getLength();
 		String msg = new String(buf, 0, len);
-		return msg+" mac:"+macAddress.toString();
+		return msg;
+	}
+	
+	private String[] receive() throws IOException{
+		byte []buf = new byte[AndroidTetherConstants.UDP_BUFFER_SIZE];
+		String []receiveInfo = new String[2];
+		DatagramPacket packet= new DatagramPacket(buf,buf.length);
+		recSocket.receive(packet);//receive & wait
+		SocketAddress ipAddress = packet.getSocketAddress();
+		receiveInfo[1] = ipAddress.toString();
+		int len = packet.getLength();
+		String msg = new String(buf, 0, len);
+		receiveInfo[0] = msg;
+		return receiveInfo;
+		
 	}
 
 }
