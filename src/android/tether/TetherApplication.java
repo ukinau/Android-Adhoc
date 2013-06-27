@@ -62,7 +62,8 @@ public class TetherApplication extends Application {
 	// CoreTask
 	public CoreTask coretask = null;
 	
-	public ArrayList<DtnMessage> dtnMsgs = null;
+	private ArrayList<DtnMessage> dtnMsgs = null;
+	private ArrayList<String> dtnHave_macAddress = null;
 	public ArrayList<String> knownIpAddress = null;
 	
 	@Override
@@ -163,6 +164,21 @@ public class TetherApplication extends Application {
 		Log.d(MSG_TAG, "Creation of configuration-files took ==> "+(System.currentTimeMillis()-startStamp)+" milliseconds.");
 	}
 
+	public void addDtnMessage(DtnMessage dtnMsg){
+		this.dtnMsgs.add(dtnMsg);
+		this.dtnHave_macAddress.add(dtnMsg.mac_address);
+	}
+	public void resetDtnMessage(){
+		this.dtnMsgs = new ArrayList<DtnMessage>();
+		this.dtnHave_macAddress = new ArrayList<String>();
+	}
+	public boolean containsDtnMessage(DtnMessage dtnMsg){
+		return this.dtnHave_macAddress.contains(dtnMsg.mac_address);
+	}
+	public ArrayList<DtnMessage> getDtnMessages(){
+		return this.dtnMsgs;
+	}
+	
 	public String exec_Ifconfig(){
 		// get the interface	
 		String net_interface = this.tethercfg.get("wifi.interface"); 

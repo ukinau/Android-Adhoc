@@ -12,10 +12,37 @@
         android:layout_height="wrap_content"
         android:text="Target Information"
         android:textColor="#000000" />
+    <TextView
+        android:id="@+id/target_name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name:"
+        android:textColor="#000000" />
 	<EditText 
-	    android:id="@+id/targetText_form"
+	    android:id="@+id/target_name"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"/>    
+	<TextView
+        android:id="@+id/target_address_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="address:"
+        android:textColor="#000000" />
+	<EditText 
+	    android:id="@+id/target_address"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"/> 
+	<TextView
+        android:id="@+id/target_facebook_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="facebook:"
+        android:textColor="#000000" />
+	<EditText 
+	    android:id="@+id/target_facebook"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"/> 
+	
 	
 	<Button
 	    android:id="@+id/setTargetText"
@@ -40,7 +67,7 @@
         android:textColor="#000000"
         />
 	 <ListView
-	    android:id="@+id/message_box_listView"
+	    android:id="@+id/dtn_message_box_listView"
 	    android:layout_width="match_parent"
 	    android:layout_height="fill_parent"
 	    android:layout_alignParentLeft="true"
