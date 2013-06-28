@@ -179,6 +179,27 @@ public class TetherApplication extends Application {
 		return this.dtnMsgs;
 	}
 	
+	public void settingMyRescueMessage(DtnMessage myMsg){
+		if(myMsg.name != null)
+			this.preferenceEditor.putString("dtn-my-message-name",myMsg.name);
+		if(myMsg.address != null)
+			this.preferenceEditor.putString("dtn-my-message-address",myMsg.address);
+		if(myMsg.facebook != null)
+			this.preferenceEditor.putString("dtn-my-message-facebook",myMsg.facebook);
+		if(myMsg.mac_address != null)
+			this.preferenceEditor.putString("dtn-my-message-macaddress",myMsg.mac_address);
+		this.preferenceEditor.commit();
+	}
+	
+	public DtnMessage getMyRescueMessage(){
+		DtnMessage newMsg = new DtnMessage();
+		newMsg.name = this.settings.getString("dtn-my-message-name", "デフォルト太郎");
+		newMsg.address = this.settings.getString("dtn-my-message-address", "デフォルト県デフォルト市1-30");
+		newMsg.facebook = this.settings.getString("dtn-my-message-facebook", "http://facebook.com");
+		newMsg.mac_address = this.settings.getString("dtn-my-message-macaddress", getMacAddress());
+		return newMsg;
+	}
+	
 	public String exec_Ifconfig(){
 		// get the interface	
 		String net_interface = this.tethercfg.get("wifi.interface"); 

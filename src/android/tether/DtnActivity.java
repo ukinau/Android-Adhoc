@@ -1,7 +1,6 @@
 package android.tether;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,118 +9,220 @@ import android.os.Message;
 import android.tether.dtn.DtnBase;
 import android.tether.dtn.DtnFlattingOnlyUdpBroadCast;
 import android.tether.dtn.DtnMessage;
+import android.tether.dtn.FetchModeThread;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class DtnActivity extends Activity {
-	
+
 	public static final String MSG_TAG = "TETHER -> DtnAcitivity";
 	private TetherApplication application;
 	private ArrayAdapter<String> dtnMsgBoxAdapter;
 	private DtnBase dtnImplement;
+	private FetchModeThread fetchModeThread;
+
+	private MultiDirectionSlidingDrawer mDrawerBottom;
+	private TextView dtn_status_myMode;
+	private Button startButton;
+	private Button stopButton;
+	private Button changeToRescueButton;
+	
 	
 	// to deal with UI by other thread
-	private final Handler  messageBoxListHandler=new Handler() {
-		 public void handleMessage(Message msg) {
-			 Bundle data=msg.getData();
-			 String body = data.getString("msg");
-	  		 Toast.makeText(DtnActivity.this, body , Toast.LENGTH_LONG).show();
-	  		 dtnMsgBoxAdapter.add(body);
-	  		 dtnMsgBoxAdapter.notifyDataSetChanged();
-		 }
+	private final Handler messageBoxListHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			Bundle data = msg.getData();
+			String body = data.getString("msg");
+			Toast.makeText(DtnActivity.this, body, Toast.LENGTH_LONG).show();
+			dtnMsgBoxAdapter.add(body);
+			dtnMsgBoxAdapter.notifyDataSetChanged();
+		}
 	};
-	private DtnBase getDtnImplement(int mode,TetherApplication app,Handler handle){
-		DtnBase dtnImplement = new DtnFlattingOnlyUdpBroadCast( mode, app, handle);
-		return dtnImplement;
-	 }
 	
-	public void onCreate(Bundle savedInstanced){
+	private final Handler fetchModeHandler = new Handler(){
+		public void handleMessage(Message msg){
+			Bundle data = msg.getData();
+			String mode = data.getString("mode");
+			String base = "モード：";
+			dtn_status_myMode.setText(base+mode);
+		}
+	};
+
+	private DtnBase getDtnImplement(int mode, TetherApplication app, Handler handle) {
+		DtnBase dtnImplement = new DtnFlattingOnlyUdpBroadCast(mode, app, handle);
+		return dtnImplement;
+	}
+
+	public void onCreate(Bundle savedInstanced) {
 		super.onCreate(savedInstanced);
 		setContentView(R.layout.dtn_content);
 		// Init Application
-        this.application = (TetherApplication)this.getApplication();
-        
-        ListView messageBoxList = (ListView)findViewById(R.id.dtn_message_box_listView);
-        dtnMsgBoxAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-	   	messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
-	   	
-        Button setButton = (Button)findViewById(R.id.setTargetText);
-        setButton.setOnClickListener(new OnClickListener(){
-			public void onClick(View paramView) {
-				DtnMessage dtnMessage = new DtnMessage();
-				EditText name = (EditText)findViewById(R.id.target_name);
-				EditText address = (EditText)findViewById(R.id.target_address);
-				EditText facebook = (EditText)findViewById(R.id.target_facebook);
-				dtnMessage.name = name.getText().toString();
-				dtnMessage.address = address.getText().toString(); 
-				dtnMessage.facebook = facebook.getText().toString(); 
-				dtnMessage.mac_address = DtnActivity.this.application.getMacAddress();
-				if(DtnActivity.this.dtnImplement != null){
-					DtnActivity.this.dtnImplement.setTargetMsg(dtnMessage);
-					DtnActivity.this.dtnImplement.rescueMode = DtnBase.MODE_NEED_RESCUE;
-				}
-			}
-        });
-        
+		this.application = (TetherApplication) this.getApplication();
+		// Set diplay  adding Message 
+		bottomSlidingDrawerEventRegist();
+		bottonEventRegist();
+		this.dtn_status_myMode = (TextView)findViewById(R.id.dtn_status_my_mode);
 	}
-	
+
 	@Override
-	  public void onStart(){
+	public void onStart() {
 		super.onStart();
-		Log.d(MSG_TAG,"onStart");
-	  }
-	  @Override
-	  public void onResume(){
+		Log.d(MSG_TAG, "onStart");
+	}
+
+	@Override
+	public void onResume() {
 		super.onResume();
-		Log.d(MSG_TAG,"onResume");
-		startDtnAlgorithm();
-	  }
-	  @Override
-	  public void onPause(){
+		Log.d(MSG_TAG, "onResume");
+	}
+
+	@Override
+	public void onPause() {
 		super.onPause();
-		Log.d(MSG_TAG,"onPause");
+		Log.d(MSG_TAG, "onPause");
 		stopDtnAlgorithm();
-	  }
-	  @Override
-	  public void onStop(){
+	}
+
+	@Override
+	public void onStop() {
 		super.onStop();
-		Log.d(MSG_TAG,"onStop");
-	  }
+		Log.d(MSG_TAG, "onStop");
+	}
+
+	public void onDestory() {
+		super.onDestroy();
+		Log.d(MSG_TAG, "onDestroy");
+	}
+
+	private boolean startDtnAlgorithm() {
+		Log.d(MSG_TAG, "Start Dtn Algorithm");
+		if(this.dtnImplement == null){
+			TextView dtn_status = (TextView)findViewById(R.id.dtn_status);
+			dtn_status.setText("DTNステータス：アルゴリズムスタート");
+			// Initialize listView
+			ListView messageBoxList = (ListView) findViewById(R.id.dtn_message_box_listView);
+			dtnMsgBoxAdapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1);
+			messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
 	
-	  public void onDestory(){
-		  super.onDestroy();
-		  Log.d(MSG_TAG,"onDestroy");
-	  }
-	  
-	 private void startDtnAlgorithm(){
-		 Log.d(MSG_TAG,"Start Dtn Algorithm");
-		 // Initialize listView
-		 ListView messageBoxList = (ListView)findViewById(R.id.dtn_message_box_listView);
-	     dtnMsgBoxAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-		 messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
-		 
-		 Thread thread = new Thread(new Runnable(){
+			DtnActivity.this.dtnImplement = getDtnImplement( DtnBase.MODE_CAN_MOVE,
+					DtnActivity.this.application, DtnActivity.this.messageBoxListHandler);
+		
+			Thread thread = new Thread(new Runnable() {
 				public void run() {
-					DtnActivity.this.dtnImplement = getDtnImplement(DtnBase.MODE_CAN_MOVE,
-							DtnActivity.this.application,DtnActivity.this.messageBoxListHandler);
 					DtnActivity.this.dtnImplement.start();
 				}
-				
 			});
-		thread.start();
-	 }
-	 private void stopDtnAlgorithm(){
-		Log.d(MSG_TAG,"Stop Dtn Algorithm");
-		this.dtnImplement.executeStatus = false;
-		this.dtnImplement.stop();
+			thread.start();
+			this.fetchModeThread = new FetchModeThread(this.fetchModeHandler, this.dtnImplement, 5);
+			this.fetchModeThread.start();
+			return true;
+		}
+		return false;
 	}
-	 
+
+	private void stopDtnAlgorithm() {
+		Log.d(MSG_TAG, "Stop Dtn Algorithm");
+		TextView dtn_status = (TextView)findViewById(R.id.dtn_status);
+		dtn_status.setText("DTNステータス： アルゴリズムストップ");
+		if(this.dtnImplement != null){
+			this.dtnImplement.executeStatus = false;
+			this.dtnImplement.stop();
+			this.dtnImplement = null;
+		}
+		if(this.fetchModeThread != null){
+			this.fetchModeThread.stopThread();
+			this.fetchModeThread = null;
+		}
+		
+		// Reset listView
+		ListView messageBoxList = (ListView) findViewById(R.id.dtn_message_box_listView);
+		dtnMsgBoxAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1);
+		messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
+		// Reset TextView
+		this.dtn_status_myMode.setText("");
+	}
+
+	private void changeModeToNeedRescue(){
+		if(DtnActivity.this.dtnImplement != null){
+			DtnMessage myMsg = DtnActivity.this.application.getMyRescueMessage();
+			DtnActivity.this.dtnImplement .setTargetMsg(myMsg);
+			DtnActivity.this.dtnImplement.rescueMode = DtnBase.MODE_NEED_RESCUE;
+		}
+	}
+	
+	private void bottonEventRegist(){
+		this.startButton = (Button)findViewById(R.id.algolithm_startButton);
+		this.startButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View paramView) {
+				startDtnAlgorithm();
+			}
+		});
+		this.stopButton = (Button)findViewById(R.id.algolithm_stopButton);
+		this.stopButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View paramView) {
+				stopDtnAlgorithm();
+			}
+		});
+		this.changeToRescueButton = (Button)findViewById(R.id.changeToRescueMode);
+		this.changeToRescueButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View paramView) {
+				changeModeToNeedRescue();
+			}
+		});
+	}
+	
+	private void bottomSlidingDrawerEventRegist() {
+		// SlidingDrawer Layout to correspond scanning SSID
+		mDrawerBottom = (MultiDirectionSlidingDrawer) findViewById(R.id.drawerBottom);
+		mDrawerBottom
+				.setOnDrawerOpenListener(new it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer.OnDrawerOpenListener() {
+					public void onDrawerOpened() {
+						LinearLayout a = (LinearLayout) findViewById(R.id.main_box);
+						Button c = (Button) findViewById(R.id.handle);
+						c.setText("↓閉じる↓");
+						a.setVisibility(View.GONE);
+						
+						DtnMessage myMsg = DtnActivity.this.application.getMyRescueMessage();
+						final EditText name = (EditText) findViewById(R.id.target_name);
+						final EditText address = (EditText) findViewById(R.id.target_address);
+						final EditText facebook = (EditText) findViewById(R.id.target_facebook);
+						name.setText(myMsg.name);
+						address.setText(myMsg.address);
+						facebook.setText(myMsg.facebook);
+						
+						Button setButton = (Button) findViewById(R.id.setTargetText);
+						setButton.setOnClickListener(new OnClickListener() {
+							public void onClick(View paramView) {
+								DtnMessage dtnMessage = new DtnMessage();
+								dtnMessage.name = name.getText().toString();
+								dtnMessage.address = address.getText().toString();
+								dtnMessage.facebook = facebook.getText().toString();
+								dtnMessage.mac_address = DtnActivity.this.application.getMacAddress();
+								DtnActivity.this.application.settingMyRescueMessage(dtnMessage);
+							}
+						});
+
+					}
+				});
+		mDrawerBottom
+				.setOnDrawerCloseListener(new it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer.OnDrawerCloseListener() {
+					public void onDrawerClosed() {
+						LinearLayout a = (LinearLayout) findViewById(R.id.main_box);
+						Button c = (Button) findViewById(R.id.handle);
+						c.setText("↑レスキューメッセージをセット↑");
+						a.setVisibility(View.VISIBLE);
+					}
+				});
+	}
 
 }
