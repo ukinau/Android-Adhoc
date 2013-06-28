@@ -13,9 +13,16 @@ import android.tether.udp.UdpSendThread;
 import android.util.Log;
 
 public abstract class DtnBase {
+	/**
+	 * アルゴリズム実行時に最初に一度だけ呼ばれる処理
+	 * パケットを受け取るスレッドをstartしたりする
+	 */
 	public abstract void setup();
+	/**
+	 * アルゴリズム実行時に
+	 * 繰り返し実行される処理を書く
+	 */
 	public abstract void loop();
-	public abstract void stop();
 	public final static int MODE_NEED_RESCUE = 0;
 	public final static int MODE_CAN_MOVE = 1;
 	public final static int MODE_CAN_MOVE_HAVE_MESSAGE = 2;
@@ -40,5 +47,8 @@ public abstract class DtnBase {
 			loop();
 			try { Thread.sleep(interval*1000); } catch (InterruptedException e) { e.printStackTrace(); }
 		}	
+	}
+	public void stop(){
+		this.executeStatus = false;
 	}
 }

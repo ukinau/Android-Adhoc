@@ -83,7 +83,7 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 			}
 		};
 	}
-	
+	@Override
 	public void setup(){
 		try{
 			Log.d(MSG_TAG,"Create Udp receive thread");
@@ -94,7 +94,7 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 			Log.d(MSG_TAG,"Can't start udpReceiver thread: "+e.getMessage());
 		}
 	}
-	
+	@Override
 	public void loop(){
 		switch(this.rescueMode){
 			case MODE_NEED_RESCUE:
@@ -152,11 +152,11 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 	}
 	@Override
 	public void stop() {
+		super.stop();
 		if(this.udpReceiver != null){
 			this.udpReceiver.stopThread();
 			Log.d(MSG_TAG,"Stop Udp receiver thread");
 		}
-		//this.executeStatus = false;
 	}
 
 }

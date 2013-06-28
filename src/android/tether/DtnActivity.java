@@ -133,14 +133,13 @@ public class DtnActivity extends Activity {
 		Log.d(MSG_TAG, "Stop Dtn Algorithm");
 		TextView dtn_status = (TextView)findViewById(R.id.dtn_status);
 		dtn_status.setText("DTNステータス： アルゴリズムストップ");
-		if(this.dtnImplement != null){
-			this.dtnImplement.executeStatus = false;
-			this.dtnImplement.stop();
-			this.dtnImplement = null;
-		}
 		if(this.fetchModeThread != null){
 			this.fetchModeThread.stopThread();
 			this.fetchModeThread = null;
+		}
+		if(this.dtnImplement != null){
+			this.dtnImplement.stop();
+			this.dtnImplement = null;
 		}
 		
 		// Reset listView
