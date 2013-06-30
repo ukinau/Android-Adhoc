@@ -1,18 +1,11 @@
 package android.tether.dtn;
 
-import java.util.ArrayList;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import android.os.Handler;
-import android.tether.system.AndroidTetherConstants;
-import android.tether.tcp.TcpHandleConnectionThread;
-import android.tether.udp.UdpReceiveThread;
-import android.tether.udp.UdpSendThread;
-import android.util.Log;
+import android.tether.TetherApplication;
 
 public abstract class DtnBase {
+	public final static String MSG_TAG_SEND = "SEND_PACKET";
+	public final static String MSG_TAG_RECV = "RECV_PACKET";
 	/**
 	 * アルゴリズム実行時に最初に一度だけ呼ばれる処理
 	 * パケットを受け取るスレッドをstartしたりする
@@ -26,20 +19,22 @@ public abstract class DtnBase {
 	public final static int MODE_NEED_RESCUE = 0;
 	public final static int MODE_CAN_MOVE = 1;
 	public final static int MODE_CAN_MOVE_HAVE_MESSAGE = 2;
-	public int rescueMode;
-	public boolean executeStatus;
-	public int interval = 1;
+	public int interval;
+	protected TetherApplication app;
+	protected Handler handler;
 	
-
-	public static final String MSG_TAG = "DtnImplements";
+	private int rescueMode;
+	private boolean executeStatus;
 	private DtnMessage targetMsg;
 	
-	public void setTargetMsg(DtnMessage msg){
-		targetMsg = msg;
+	public DtnBase(TetherApplication app, Handler handler,int firstMode,int interval){
+		this.rescueMode = firstMode;
+		this.interval = interval;
+		this.handler = handler;
+		this.app = app;
+		this.executeStatus = false;
 	}
-	public DtnMessage getTargetMsg(){
-		return targetMsg;
-	}
+	
 	public void start(){
 		this.executeStatus = true;
 		setup();
@@ -50,5 +45,19 @@ public abstract class DtnBase {
 	}
 	public void stop(){
 		this.executeStatus = false;
+	}
+	
+	public void setTargetMsg(DtnMessage msg){
+		targetMsg = msg;
+	}
+	public DtnMessage getTargetMsg(){
+		return this.targetMsg;
+	}
+	
+	public void changeModeTo(int newMode){
+		this.rescueMode = newMode;
+	}
+	public int getDtnMode(){
+		return this.rescueMode;
 	}
 }

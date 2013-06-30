@@ -31,20 +31,12 @@ import android.util.Log;
  */
 public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 	public final static String MSG_TAG = "DTN -> DtnFlattingOnlyUdpBroadCast";
-	public final static String MSG_TAG_SEND = "SEND_PACKET";
-	public final static String MSG_TAG_RECV = "RECV_PACKET";
-	
 	private UdpReceiveThread udpReceiver;
-	private TetherApplication app;
-	private Handler handler;
 	private ReceivedBehaver revBehaver;
 	
 	public DtnFlattingOnlyUdpBroadCast(int FirstMode,TetherApplication app,Handler handle){
-		this.handler = handle;
-		this.rescueMode = FirstMode;
-		this.app = app;
-		this.executeStatus = false;
-		DtnFlattingOnlyUdpBroadCast.this.app.resetDtnMessage();
+		super(app,handle,FirstMode,5);
+		this.app.resetDtnMessage();
 		this.revBehaver = new ReceivedBehaver(){
 			public void after_packet_received(String ipAddress,String xml) {
 				try {
@@ -66,9 +58,9 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 							msg.setData(data);
 							DtnFlattingOnlyUdpBroadCast.this.handler.sendMessage(msg);
 							
-							switch(DtnFlattingOnlyUdpBroadCast.this.rescueMode){
+							switch(DtnFlattingOnlyUdpBroadCast.this.getDtnMode()){
 								case MODE_CAN_MOVE:
-									DtnFlattingOnlyUdpBroadCast.this.rescueMode = MODE_CAN_MOVE_HAVE_MESSAGE;
+									DtnFlattingOnlyUdpBroadCast.this.changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
 									break;
 							}
 						}
@@ -96,7 +88,7 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 	}
 	@Override
 	public void loop(){
-		switch(this.rescueMode){
+		switch(this.getDtnMode()){
 			case MODE_NEED_RESCUE:
 				String ipAddress = this.app.getIpAddress_fromIfconfig(); 
 				int lastIpNumberPoint = ipAddress.lastIndexOf(".");

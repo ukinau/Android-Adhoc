@@ -22,7 +22,7 @@ public class FetchModeThread extends Thread {
 		while(this.excute_status){
 			Bundle data = new Bundle();
 			String mode = "";
-			switch(this.dtnImplement.rescueMode){
+			switch(this.dtnImplement.getDtnMode()){
 				case DtnBase.MODE_CAN_MOVE:
 					mode = "移動者";
 					break;

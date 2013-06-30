@@ -155,7 +155,7 @@ public class DtnActivity extends Activity {
 		if(DtnActivity.this.dtnImplement != null){
 			DtnMessage myMsg = DtnActivity.this.application.getMyRescueMessage();
 			DtnActivity.this.dtnImplement .setTargetMsg(myMsg);
-			DtnActivity.this.dtnImplement.rescueMode = DtnBase.MODE_NEED_RESCUE;
+			DtnActivity.this.dtnImplement.changeModeTo(DtnBase.MODE_NEED_RESCUE);
 		}
 	}
 	
