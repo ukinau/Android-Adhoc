@@ -51,11 +51,8 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
 							DtnFlattingOnlyUdpBroadCast.this.app.addDtnMessage(newBuilder.messages.get(i));
 							// Reflect the ListView
 							Message msg = new Message();
-							Bundle data=new Bundle();
 							DtnMessage dtnM = newBuilder.messages.get(i);
-							data.putString("msg","名前："+dtnM.name+"\n"+"住所:"+dtnM.address+"\n"+"facebook:"+dtnM.facebook);
-							data.putString("protocol", "" );
-							msg.setData(data);
+							msg.obj = dtnM;
 							DtnFlattingOnlyUdpBroadCast.this.handler.sendMessage(msg);
 							
 							switch(DtnFlattingOnlyUdpBroadCast.this.getDtnMode()){

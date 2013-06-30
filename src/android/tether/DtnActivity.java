@@ -1,7 +1,7 @@
 package android.tether;
 
+import java.util.ArrayList;
 import it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,11 +9,11 @@ import android.os.Message;
 import android.tether.dtn.DtnBase;
 import android.tether.dtn.DtnFlattingOnlyUdpBroadCast;
 import android.tether.dtn.DtnMessage;
+import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,7 +25,7 @@ public class DtnActivity extends Activity {
 
 	public static final String MSG_TAG = "TETHER -> DtnAcitivity";
 	private TetherApplication application;
-	private ArrayAdapter<String> dtnMsgBoxAdapter;
+	private DtnMessageArrayAdapter dtnMsgBoxAdapter;
 	private DtnBase dtnImplement;
 	private FetchModeThread fetchModeThread;
 
@@ -39,10 +39,8 @@ public class DtnActivity extends Activity {
 	// to deal with UI by other thread
 	private final Handler messageBoxListHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Bundle data = msg.getData();
-			String body = data.getString("msg");
-			Toast.makeText(DtnActivity.this, body, Toast.LENGTH_LONG).show();
-			dtnMsgBoxAdapter.add(body);
+			Toast.makeText(DtnActivity.this, "受信", Toast.LENGTH_LONG).show();
+			dtnMsgBoxAdapter.add((DtnMessage)msg.obj);
 			dtnMsgBoxAdapter.notifyDataSetChanged();
 		}
 	};
@@ -109,8 +107,7 @@ public class DtnActivity extends Activity {
 			dtn_status.setText("DTNステータス：アルゴリズムスタート");
 			// Initialize listView
 			ListView messageBoxList = (ListView) findViewById(R.id.dtn_message_box_listView);
-			dtnMsgBoxAdapter = new ArrayAdapter<String>(this,
-					android.R.layout.simple_list_item_1);
+			dtnMsgBoxAdapter = new DtnMessageArrayAdapter(this, R.layout.dtnmessages_list_cell ,new ArrayList<DtnMessage>(),getResources()); 
 			messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
 	
 			DtnActivity.this.dtnImplement = getDtnImplement( DtnBase.MODE_CAN_MOVE,
@@ -144,8 +141,7 @@ public class DtnActivity extends Activity {
 		
 		// Reset listView
 		ListView messageBoxList = (ListView) findViewById(R.id.dtn_message_box_listView);
-		dtnMsgBoxAdapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1);
+		dtnMsgBoxAdapter = new DtnMessageArrayAdapter(this, R.layout.dtnmessages_list_cell , new ArrayList<DtnMessage>(),getResources());
 		messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
 		// Reset TextView
 		this.dtn_status_myMode.setText("");
