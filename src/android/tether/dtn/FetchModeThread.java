@@ -3,6 +3,7 @@ package android.tether.dtn;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.tether.dtn.algorithm.DtnBase;
 
 public class FetchModeThread extends Thread {
 	private boolean excute_status;

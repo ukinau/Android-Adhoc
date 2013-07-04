@@ -1,4 +1,4 @@
-package android.tether.dtn;
+package android.tether.dtn.algorithm;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +15,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.tether.CommunicateActivity;
 import android.tether.TetherApplication;
+import android.tether.dtn.DtnMessage;
+import android.tether.dtn.FormatBuilder;
+import android.tether.dtn.ReceivedBehaver;
 import android.tether.system.AndroidTetherConstants;
 import android.tether.udp.UdpReceiveThread;
 import android.tether.udp.UdpSendThread;

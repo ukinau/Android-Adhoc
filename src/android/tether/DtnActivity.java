@@ -1,16 +1,20 @@
 package android.tether;
 
 import java.util.ArrayList;
+import java.util.List;
 import it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer;
 import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.tether.dtn.DtnBase;
-import android.tether.dtn.DtnFlattingOnlyUdpBroadCast;
 import android.tether.dtn.DtnMessage;
 import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
+import android.tether.dtn.algorithm.DtnBase;
+import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCast;
+import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,6 +32,9 @@ public class DtnActivity extends Activity {
 	private DtnMessageArrayAdapter dtnMsgBoxAdapter;
 	private DtnBase dtnImplement;
 	private FetchModeThread fetchModeThread;
+	private SensorManager accelManager;
+	private DtnAccelerateSensorEvent accelEvent;
+
 
 	private MultiDirectionSlidingDrawer mDrawerBottom;
 	private TextView dtn_status_myMode;
@@ -68,6 +75,9 @@ public class DtnActivity extends Activity {
 		bottomSlidingDrawerEventRegist();
 		bottonEventRegist();
 		this.dtn_status_myMode = (TextView)findViewById(R.id.dtn_status_my_mode);
+		
+		this.accelManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+		this.accelEvent = new DtnAccelerateSensorEvent();
 	}
 
 	@Override
@@ -80,6 +90,12 @@ public class DtnActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		Log.d(MSG_TAG, "onResume");
+		// Listenerの登録
+		List<Sensor> sensors = accelManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+		if(sensors.size() > 0) {
+			Sensor s = sensors.get(0);
+			accelManager.registerListener(this.accelEvent, s, SensorManager.SENSOR_DELAY_UI);
+		}
 	}
 
 	@Override
@@ -87,6 +103,7 @@ public class DtnActivity extends Activity {
 		super.onPause();
 		Log.d(MSG_TAG, "onPause");
 		stopDtnAlgorithm();
+		accelManager.unregisterListener(this.accelEvent);
 	}
 
 	@Override

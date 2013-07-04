@@ -1,7 +1,8 @@
-package android.tether.dtn;
+package android.tether.dtn.algorithm;
 
 import android.os.Handler;
 import android.tether.TetherApplication;
+import android.tether.dtn.DtnMessage;
 
 public abstract class DtnBase {
 	public final static String MSG_TAG_SEND = "SEND_PACKET";

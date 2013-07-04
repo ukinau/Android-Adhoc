@@ -1,9 +1,10 @@
-package android.tether.dtn;
+package android.tether.dtn.algorithm;
 
 import java.net.SocketAddress;
 
 import android.os.Handler;
 import android.tether.TetherApplication;
+import android.tether.dtn.ReceivedBehaver;
 import android.tether.system.AndroidTetherConstants;
 import android.tether.tcp.TcpHandleConnectionThread;
 import android.tether.udp.UdpReceiveThread;
