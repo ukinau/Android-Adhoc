@@ -38,7 +38,7 @@
     <TabWidget
       android:id="@android:id/tabs"
       android:layout_width="fill_parent"
-      android:layout_height="40dip"
+      android:layout_height="50dip"
       />
     
     <FrameLayout
