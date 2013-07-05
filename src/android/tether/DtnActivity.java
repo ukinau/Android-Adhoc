@@ -12,9 +12,11 @@ import android.os.Message;
 import android.tether.dtn.DtnMessage;
 import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
-import android.tether.dtn.algorithm.DtnBase;
+import android.tether.dtn.algorithm.DtnBaseAlgorithm;
 import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCast;
 import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
+import android.tether.dtn.sensor.FetchShakeAlgorithm;
+import android.tether.dtn.sensor.ShookBehaverInterface;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,7 +32,7 @@ public class DtnActivity extends Activity {
 	public static final String MSG_TAG = "TETHER -> DtnAcitivity";
 	private TetherApplication application;
 	private DtnMessageArrayAdapter dtnMsgBoxAdapter;
-	private DtnBase dtnImplement;
+	private DtnBaseAlgorithm dtnImplement;
 	private FetchModeThread fetchModeThread;
 	private SensorManager accelManager;
 	private DtnAccelerateSensorEvent accelEvent;
@@ -61,8 +63,8 @@ public class DtnActivity extends Activity {
 		}
 	};
 
-	private DtnBase getDtnImplement(int mode, TetherApplication app, Handler handle) {
-		DtnBase dtnImplement = new DtnFlattingOnlyUdpBroadCast(mode, app, handle);
+	private DtnBaseAlgorithm getDtnImplement(int mode, TetherApplication app, Handler handle) {
+		DtnBaseAlgorithm dtnImplement = new DtnFlattingOnlyUdpBroadCast(mode, app, handle);
 		return dtnImplement;
 	}
 
@@ -75,9 +77,15 @@ public class DtnActivity extends Activity {
 		bottomSlidingDrawerEventRegist();
 		bottonEventRegist();
 		this.dtn_status_myMode = (TextView)findViewById(R.id.dtn_status_my_mode);
-		
 		this.accelManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-		this.accelEvent = new DtnAccelerateSensorEvent();
+		this.accelEvent = new DtnAccelerateSensorEvent(
+				new FetchShakeAlgorithm(new ShookBehaverInterface() {
+					public void after_shook_behaver() {
+						if(DtnActivity.this.dtnImplement != null){
+							DtnActivity.this.dtnImplement.changeModeTo(DtnBaseAlgorithm.MODE_NEED_RESCUE);
+						}
+					}
+				}));
 	}
 
 	@Override
@@ -127,7 +135,7 @@ public class DtnActivity extends Activity {
 			dtnMsgBoxAdapter = new DtnMessageArrayAdapter(this, R.layout.dtnmessages_list_cell ,new ArrayList<DtnMessage>(),getResources()); 
 			messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
 	
-			DtnActivity.this.dtnImplement = getDtnImplement( DtnBase.MODE_CAN_MOVE,
+			DtnActivity.this.dtnImplement = getDtnImplement( DtnBaseAlgorithm.MODE_CAN_MOVE,
 					DtnActivity.this.application, DtnActivity.this.messageBoxListHandler);
 		
 			Thread thread = new Thread(new Runnable() {
@@ -136,7 +144,7 @@ public class DtnActivity extends Activity {
 				}
 			});
 			thread.start();
-			this.fetchModeThread = new FetchModeThread(this.fetchModeHandler, this.dtnImplement, 5);
+			this.fetchModeThread = new FetchModeThread(this.fetchModeHandler, this.dtnImplement, 1);
 			this.fetchModeThread.start();
 			return true;
 		}
@@ -166,9 +174,7 @@ public class DtnActivity extends Activity {
 
 	private void changeModeToNeedRescue(){
 		if(DtnActivity.this.dtnImplement != null){
-			DtnMessage myMsg = DtnActivity.this.application.getMyRescueMessage();
-			DtnActivity.this.dtnImplement .setTargetMsg(myMsg);
-			DtnActivity.this.dtnImplement.changeModeTo(DtnBase.MODE_NEED_RESCUE);
+			DtnActivity.this.dtnImplement.changeModeTo(DtnBaseAlgorithm.MODE_NEED_RESCUE);
 		}
 	}
 	

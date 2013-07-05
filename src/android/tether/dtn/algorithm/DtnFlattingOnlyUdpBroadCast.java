@@ -32,7 +32,7 @@ import android.util.Log;
  * UDPで定期的に持っているメッセージをブロードキャストアルゴリズム
  * The algorithm that constantly send the message I have through UDP 
  */
-public class DtnFlattingOnlyUdpBroadCast extends DtnBase {
+public class DtnFlattingOnlyUdpBroadCast extends DtnBaseAlgorithm {
 	public final static String MSG_TAG = "DTN -> DtnFlattingOnlyUdpBroadCast";
 	private UdpReceiveThread udpReceiver;
 	private ReceivedBehaver revBehaver;

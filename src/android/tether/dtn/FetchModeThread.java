@@ -3,15 +3,15 @@ package android.tether.dtn;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.tether.dtn.algorithm.DtnBase;
+import android.tether.dtn.algorithm.DtnBaseAlgorithm;
 
 public class FetchModeThread extends Thread {
 	private boolean excute_status;
 	private Handler handler;
-	private DtnBase dtnImplement;
+	private DtnBaseAlgorithm dtnImplement;
 	private int interval;
 	
-	public FetchModeThread(Handler handle,DtnBase dtnImplement,int interval){
+	public FetchModeThread(Handler handle,DtnBaseAlgorithm dtnImplement,int interval){
 		this.excute_status = true;
 		this.handler = handle;
 		this.dtnImplement = dtnImplement;
@@ -24,13 +24,13 @@ public class FetchModeThread extends Thread {
 			Bundle data = new Bundle();
 			String mode = "";
 			switch(this.dtnImplement.getDtnMode()){
-				case DtnBase.MODE_CAN_MOVE:
+				case DtnBaseAlgorithm.MODE_CAN_MOVE:
 					mode = "移動者";
 					break;
-				case DtnBase.MODE_CAN_MOVE_HAVE_MESSAGE:
+				case DtnBaseAlgorithm.MODE_CAN_MOVE_HAVE_MESSAGE:
 					mode = "移動者（レスキューメッセージ所持）";
 					break;
-				case DtnBase.MODE_NEED_RESCUE:
+				case DtnBaseAlgorithm.MODE_NEED_RESCUE:
 					mode = "要救助者";
 					break;
 			}

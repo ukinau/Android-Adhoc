@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.tether.TetherApplication;
 import android.tether.dtn.DtnMessage;
 
-public abstract class DtnBase {
+public abstract class DtnBaseAlgorithm {
 	public final static String MSG_TAG_SEND = "SEND_PACKET";
 	public final static String MSG_TAG_RECV = "RECV_PACKET";
 	/**
@@ -28,7 +28,7 @@ public abstract class DtnBase {
 	private boolean executeStatus;
 	private DtnMessage targetMsg;
 	
-	public DtnBase(TetherApplication app, Handler handler,int firstMode,int interval){
+	public DtnBaseAlgorithm(TetherApplication app, Handler handler,int firstMode,int interval){
 		this.rescueMode = firstMode;
 		this.interval = interval;
 		this.handler = handler;
@@ -56,6 +56,13 @@ public abstract class DtnBase {
 	}
 	
 	public void changeModeTo(int newMode){
+		switch(newMode){
+			case MODE_NEED_RESCUE:
+				if(this.targetMsg == null){
+					setTargetMsg(this.app.getMyRescueMessage());
+				}
+				break;
+		}
 		this.rescueMode = newMode;
 	}
 	public int getDtnMode(){
