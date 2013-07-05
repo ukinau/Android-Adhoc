@@ -32,12 +32,12 @@ import android.util.Log;
  * UDPで定期的に持っているメッセージをブロードキャストアルゴリズム
  * The algorithm that constantly send the message I have through UDP 
  */
-public class DtnFlattingOnlyUdpBroadCast extends DtnBaseAlgorithm {
+public class DtnFlattingOnlyUdpBroadCastSample extends DtnBaseAlgorithm {
 	public final static String MSG_TAG = "DTN -> DtnFlattingOnlyUdpBroadCast";
 	private UdpReceiveThread udpReceiver;
 	private ReceivedBehaver revBehaver;
 	
-	public DtnFlattingOnlyUdpBroadCast(int FirstMode,TetherApplication app,Handler handle){
+	public DtnFlattingOnlyUdpBroadCastSample(int FirstMode,TetherApplication app,Handler handle){
 		super(app,handle,FirstMode,5);
 		this.app.resetDtnMessage();
 		this.revBehaver = new ReceivedBehaver(){
@@ -50,17 +50,17 @@ public class DtnFlattingOnlyUdpBroadCast extends DtnBaseAlgorithm {
 						Pattern p = Pattern.compile(regex);
 						Matcher m = p.matcher(newBuilder.messages.get(i).mac_address);
 						Log.d(MSG_TAG_RECV, "Receive packet from: "+ipAddress);
-						if(m.find()&&!DtnFlattingOnlyUdpBroadCast.this.app.containsDtnMessage(newBuilder.messages.get(i))){
-							DtnFlattingOnlyUdpBroadCast.this.app.addDtnMessage(newBuilder.messages.get(i));
+						if(m.find()&&!DtnFlattingOnlyUdpBroadCastSample.this.app.containsDtnMessage(newBuilder.messages.get(i))){
+							DtnFlattingOnlyUdpBroadCastSample.this.app.addDtnMessage(newBuilder.messages.get(i));
 							// Reflect the ListView
 							Message msg = new Message();
 							DtnMessage dtnM = newBuilder.messages.get(i);
 							msg.obj = dtnM;
-							DtnFlattingOnlyUdpBroadCast.this.handler.sendMessage(msg);
+							DtnFlattingOnlyUdpBroadCastSample.this.handler.sendMessage(msg);
 							
-							switch(DtnFlattingOnlyUdpBroadCast.this.getDtnMode()){
+							switch(DtnFlattingOnlyUdpBroadCastSample.this.getDtnMode()){
 								case MODE_CAN_MOVE:
-									DtnFlattingOnlyUdpBroadCast.this.changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
+									DtnFlattingOnlyUdpBroadCastSample.this.changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
 									break;
 							}
 						}

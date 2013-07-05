@@ -13,7 +13,7 @@ import android.tether.dtn.DtnMessage;
 import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
 import android.tether.dtn.algorithm.DtnBaseAlgorithm;
-import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCast;
+import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCastSample;
 import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
 import android.tether.dtn.sensor.FetchShakeAlgorithm;
 import android.tether.dtn.sensor.ShookBehaverInterface;
@@ -64,7 +64,7 @@ public class DtnActivity extends Activity {
 	};
 
 	private DtnBaseAlgorithm getDtnImplement(int mode, TetherApplication app, Handler handle) {
-		DtnBaseAlgorithm dtnImplement = new DtnFlattingOnlyUdpBroadCast(mode, app, handle);
+		DtnBaseAlgorithm dtnImplement = new DtnFlattingOnlyUdpBroadCastSample(mode, app, handle);
 		return dtnImplement;
 	}
 
