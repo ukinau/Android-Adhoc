@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -27,6 +28,10 @@ import org.xml.sax.SAXException;
 
 public class FormatBuilder {
 	public static final int B_CON = 0;
+	/*<b-con>
+	 * 	<my-mac-address>
+	 *</b-con>
+	 */
 	public static final int DEMAND_ONLY = 1;
 	/*<demand>
 		<have-message>
@@ -72,6 +77,7 @@ public class FormatBuilder {
 	public ArrayList<String> demand_messages;
 	public ArrayList<String> have_messages;
 	public ArrayList<DtnMessage> messages;
+	public String myMacAddress; // for b-con
 	
 	public FormatBuilder() throws ParserConfigurationException{
 		demand_messages = new ArrayList<String>();
@@ -92,6 +98,8 @@ public class FormatBuilder {
 		root.appendChild(kind_ele);
 		
 		switch(this.message_kind){
+			case FormatBuilder.B_CON:
+				setBcon(root,document);
 			case FormatBuilder.DEMAND_ONLY:
 				setDemand(root,document,DEMAND_HAVE_MESSAGES);
 				break;
@@ -101,6 +109,9 @@ public class FormatBuilder {
 			case FormatBuilder.MESSAGE_AND_DEMAND:
 				setDemand(root,document,DEMAND_DEMAND_MESSAGES);
 			    setMessages(root,document);
+				break;
+			default:
+				setCustomAttribute(root,document);
 				break;
 		}
 		
@@ -120,8 +131,19 @@ public class FormatBuilder {
 	    return writer.toString(); 
 	}
 	
+	protected void setCustomAttribute(Element root,Document document){
+	}
 	
-	private void setDemand(Element root,Document document,int demand_kind){
+	protected void setBcon(Element root,Document document){
+		Element bcon_ele = document.createElement("b-con");
+		Element myMacAddress_ele = document.createElement("my-mac-address");
+		Text myMacAddress_innerText = document.createTextNode(myMacAddress);
+		myMacAddress_ele.appendChild(myMacAddress_innerText);
+		bcon_ele.appendChild(myMacAddress_ele);
+		root.appendChild(bcon_ele);
+	}
+	
+	protected void setDemand(Element root,Document document,int demand_kind){
 		switch(demand_kind){
 			case DEMAND_HAVE_MESSAGES:
 				Element demand_ele = document.createElement("demand");
@@ -151,7 +173,7 @@ public class FormatBuilder {
 		}
 	}
 	
-	private void setMessages(Element root,Document document){
+	protected void setMessages(Element root,Document document){
 		Element messages_ele = document.createElement("messages");
 		for(int i=0;i<messages.size();i++){
 			Element message_ele = document.createElement("message");
@@ -202,6 +224,10 @@ public class FormatBuilder {
 		newBuilder.message_kind = kind;
 		
 		switch(kind){
+			case FormatBuilder.B_CON:
+				Node bcon_container_node = nodes.item(1);
+				newBuilder = readBcon(bcon_container_node, newBuilder);
+				break;
 			case FormatBuilder.DEMAND_ONLY:
 				Node demand_container_node = nodes.item(1);
 				newBuilder = readDemands(demand_container_node,newBuilder,DEMAND_HAVE_MESSAGES);
@@ -220,7 +246,54 @@ public class FormatBuilder {
 		return newBuilder; 
 	}
 	
-	private static FormatBuilder readDemands(Node demand_container_node,FormatBuilder newBuilder,int demand_kind){
+	public static FormatBuilder read(String xml,XmlReaderInterface readerImpl) throws ParserConfigurationException, SAXException, IOException{
+		FormatBuilder newBuilder = new FormatBuilder();
+		// function reading xml
+		InputStream bais = new ByteArrayInputStream(xml.getBytes("UTF-8")); 
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder builder = factory.newDocumentBuilder();
+		factory.setIgnoringElementContentWhitespace(true);
+		factory.setIgnoringComments(true);
+		Node document    = builder.parse(bais);
+		
+		Node root = document.getFirstChild();
+		NodeList nodes = root.getChildNodes();
+		Node kindNode = nodes.item(0);
+		
+		int kind = Integer.parseInt(kindNode.getFirstChild().getNodeValue());
+		newBuilder.message_kind = kind;		
+		newBuilder = readerImpl.readNodes(nodes,newBuilder,kind);
+		return newBuilder; 
+	}
+	
+	public interface XmlReaderInterface{
+		public FormatBuilder readNodes(NodeList nodes,FormatBuilder newBuilder,int kind);
+	}
+	
+	protected static int readMessageKind(String xml) throws ParserConfigurationException, SAXException, IOException{
+		InputStream bais = new ByteArrayInputStream(xml.getBytes("UTF-8")); 
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder builder = factory.newDocumentBuilder();
+		factory.setIgnoringElementContentWhitespace(true);
+		factory.setIgnoringComments(true);
+		Node document    = builder.parse(bais);
+		
+		Node root = document.getFirstChild();
+		NodeList nodes = root.getChildNodes();
+		Node kindNode = nodes.item(0);
+		
+		int kind = Integer.parseInt(kindNode.getFirstChild().getNodeValue());
+		return kind;
+	}
+	
+	protected static FormatBuilder readBcon(Node bcon_container_node, FormatBuilder newBuilder){
+		NodeList my_mac_address_nodes = bcon_container_node.getChildNodes();
+		Node my_mac_address_node = my_mac_address_nodes.item(0);
+		newBuilder.myMacAddress = my_mac_address_node.getFirstChild().getNodeValue();
+		return newBuilder;
+	}
+	
+	protected static FormatBuilder readDemands(Node demand_container_node,FormatBuilder newBuilder,int demand_kind){
 		switch(demand_kind){
 			case DEMAND_HAVE_MESSAGES:
 				NodeList have_message_nodes = demand_container_node.getChildNodes();
@@ -246,7 +319,7 @@ public class FormatBuilder {
 		return newBuilder;
 	}
 	
-	private static FormatBuilder readMessages(Node message_container_node,FormatBuilder newBuilder){
+	protected static FormatBuilder readMessages(Node message_container_node,FormatBuilder newBuilder){
 		NodeList messageNodes = message_container_node.getChildNodes();
 		if(messageNodes != null){
 			for(int i=0;i<messageNodes.getLength();i++){
