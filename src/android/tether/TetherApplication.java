@@ -63,6 +63,7 @@ public class TetherApplication extends Application {
 	public CoreTask coretask = null;
 	
 	private ArrayList<DtnMessage> dtnMsgs = null;
+	private DtnMessage myRescueMessage = null;
 	private ArrayList<String> dtnHave_macAddress = null;
 	public ArrayList<String> knownIpAddress = null;
 	
@@ -168,12 +169,22 @@ public class TetherApplication extends Application {
 		this.dtnMsgs.add(dtnMsg);
 		this.dtnHave_macAddress.add(dtnMsg.mac_address);
 	}
+	public void setDtnMessagesList(ArrayList<DtnMessage> dtnMsgList){
+		this.dtnMsgs = dtnMsgList;
+		this.dtnHave_macAddress = new ArrayList<String>();
+		for(int i=0;i<dtnMsgList.size();i++){
+			this.dtnHave_macAddress.add(dtnMsgList.get(i).mac_address);
+		}
+	}
 	public void resetDtnMessage(){
 		this.dtnMsgs = new ArrayList<DtnMessage>();
 		this.dtnHave_macAddress = new ArrayList<String>();
 	}
 	public boolean containsDtnMessage(DtnMessage dtnMsg){
 		return this.dtnHave_macAddress.contains(dtnMsg.mac_address);
+	}
+	public ArrayList<String> getHave_macAddressList(){
+		return this.dtnHave_macAddress;
 	}
 	public ArrayList<DtnMessage> getDtnMessages(){
 		return this.dtnMsgs;
@@ -189,10 +200,11 @@ public class TetherApplication extends Application {
 		if(myMsg.mac_address != null)
 			this.preferenceEditor.putString("dtn-my-message-macaddress",myMsg.mac_address);
 		this.preferenceEditor.commit();
+		this.myRescueMessage = myMsg;
 	}
 	
 	public DtnMessage getMyRescueMessage(){
-		DtnMessage newMsg = new DtnMessage();
+		DtnMessage newMsg = (this.myRescueMessage != null)? this.myRescueMessage : new DtnMessage();
 		newMsg.name = this.settings.getString("dtn-my-message-name", "デフォルト太郎");
 		newMsg.address = this.settings.getString("dtn-my-message-address", "デフォルト県デフォルト市1-30");
 		newMsg.facebook = this.settings.getString("dtn-my-message-facebook", "http://facebook.com");
