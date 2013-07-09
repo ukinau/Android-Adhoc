@@ -7,8 +7,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.tether.system.AndroidTetherConstants;
+import android.util.Log;
 
 public class TcpClientThread extends Thread {
+	public static final String MSG_TAG_SEND = "TcpSend";
 	private TcpClient tcpClient;
 	private String endString="¥0¥0";
 	private String msg;
@@ -22,6 +24,7 @@ public class TcpClientThread extends Thread {
 	public void run(){
 		try{
 			this.msg += endString;
+			Log.d(MSG_TAG_SEND,"DistinationIp:"+tcpClient.distinationAddress+"\n"+this.msg.split(endString)[0]);
 			tcpClient.sendMessage(this.msg);
 		}catch(Exception e){
 			e.printStackTrace();

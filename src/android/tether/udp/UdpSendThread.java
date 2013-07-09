@@ -7,9 +7,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import android.util.Log;
+
 
 public class UdpSendThread extends Thread{
-	
+	public static final String MSG_TAG_SEND = "UdpSend";
 	public UdpSend udpSocket;
 	String msg;
 	
@@ -22,6 +24,7 @@ public class UdpSendThread extends Thread{
 	public void run(){
 		try {
 			udpSocket.send(this.msg);
+			Log.d(MSG_TAG_SEND,this.msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
