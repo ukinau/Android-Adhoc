@@ -4,7 +4,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.tether.R;
 
-public class DtnMessage {
+public class DtnMessage implements Cloneable {
 	//body
 	public String name;
 	public String address;
@@ -29,5 +29,14 @@ public class DtnMessage {
 		}
 		resource_id = (image_flg)? R.drawable.ito_hideaki : R.drawable.kato_ai;
 		return r.getDrawable(resource_id);
+	}
+	
+	@Override
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new InternalError(e.toString());
+		}
 	}
 }
