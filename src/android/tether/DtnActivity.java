@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import it.sephiroth.demo.slider.widget.MultiDirectionSlidingDrawer;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -14,12 +15,18 @@ import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
 import android.tether.dtn.algorithm.DtnBaseAlgorithm;
 import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCastSample;
+import android.tether.dtn.algorithm.spray_and_wait.SprayAndWaitAlgorithm;
 import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
 import android.tether.dtn.sensor.FetchShakeAlgorithm;
 import android.tether.dtn.sensor.ShookBehaverInterface;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -43,7 +50,10 @@ public class DtnActivity extends Activity {
 	private Button startButton;
 	private Button stopButton;
 	private Button changeToRescueButton;
-	
+	private TextView algorithmKind;
+	private AlertDialog dig = null;
+	private List<String> algorithmSet = new ArrayList<String>();
+	private boolean startAlgorithmFlg = false;
 	
 	// to deal with UI by other thread
 	private final Handler messageBoxListHandler = new Handler() {
@@ -62,10 +72,25 @@ public class DtnActivity extends Activity {
 			dtn_status_myMode.setText(base+mode);
 		}
 	};
-
-	private DtnBaseAlgorithm getDtnImplement(int mode, TetherApplication app, Handler handle) {
-		DtnBaseAlgorithm dtnImplement = new DtnFlattingOnlyUdpBroadCastSample(mode, app, handle);
-		return dtnImplement;
+	
+	private void initAlgorithmSet(){
+		this.algorithmSet = new ArrayList<String>();
+		this.algorithmSet.add(DtnFlattingOnlyUdpBroadCastSample.toSTRING);
+		this.algorithmSet.add(SprayAndWaitAlgorithm.toSTRING);
+	}
+	
+	private void setDtnImplement(String dtnAlgorithm){
+		if(DtnFlattingOnlyUdpBroadCastSample.toSTRING.equals(dtnAlgorithm)){
+			this.dtnImplement = new DtnFlattingOnlyUdpBroadCastSample(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
+			this.algorithmKind.setText("DTNアルゴリズム:"+dtnAlgorithm);
+		} else if(SprayAndWaitAlgorithm.toSTRING.equals(dtnAlgorithm)){
+			this.dtnImplement = new SprayAndWaitAlgorithm(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
+			this.algorithmKind.setText("DTNアルゴリズム:"+dtnAlgorithm);
+		} //default
+		else{
+			this.dtnImplement = new DtnFlattingOnlyUdpBroadCastSample(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
+			this.algorithmKind.setText("DTNアルゴリズム:"+DtnFlattingOnlyUdpBroadCastSample.toSTRING);
+		}
 	}
 
 	public void onCreate(Bundle savedInstanced) {
@@ -76,6 +101,8 @@ public class DtnActivity extends Activity {
 		// Set diplay  adding Message 
 		bottomSlidingDrawerEventRegist();
 		bottonEventRegist();
+		initAlgorithmSet();
+		this.algorithmKind = (TextView)findViewById(R.id.dtn_algorithm_kind);
 		this.dtn_status_myMode = (TextView)findViewById(R.id.dtn_status_my_mode);
 		this.accelManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		this.accelEvent = new DtnAccelerateSensorEvent(
@@ -124,20 +151,50 @@ public class DtnActivity extends Activity {
 		super.onDestroy();
 		Log.d(MSG_TAG, "onDestroy");
 	}
-
+	// Change Algorithm
+	public boolean onCreateOptionsMenu(Menu menu) {
+		boolean ret = super.onCreateOptionsMenu(menu);
+		menu.add(0 , Menu.FIRST , Menu.NONE , "アルゴリズムの変更");
+		return ret;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		showDialog();
+		return true;
+	}
+	private void showDialog(){
+		final ArrayList<String> rows = new ArrayList<String>();
+		for(int i=0;i<this.algorithmSet.size();i++){
+			rows.add(this.algorithmSet.get(i));
+		}
+		ListView lv = new ListView(this);
+		lv.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, rows));
+		lv.setScrollingCacheEnabled(false);
+		lv.setOnItemClickListener(new OnItemClickListener(){
+			public void onItemClick(AdapterView<?> items, View view, int position, long id) {
+				String selectedAlgorithm = rows.get(position);
+				DtnActivity.this.setDtnImplement(selectedAlgorithm);
+				dig.dismiss();
+			}
+		});
+		this.dig = new AlertDialog.Builder(this)
+		.setTitle("アルゴリズムを変更")
+		.setPositiveButton("Cancel",null)
+		.setView(lv)
+		.create();
+		this.dig.show();
+	}
+	
 	private boolean startDtnAlgorithm() {
 		Log.d(MSG_TAG, "Start Dtn Algorithm");
-		if(this.dtnImplement == null){
+		if(this.dtnImplement != null && !startAlgorithmFlg){
 			TextView dtn_status = (TextView)findViewById(R.id.dtn_status);
 			dtn_status.setText("DTNステータス：アルゴリズムスタート");
 			// Initialize listView
 			ListView messageBoxList = (ListView) findViewById(R.id.dtn_message_box_listView);
 			dtnMsgBoxAdapter = new DtnMessageArrayAdapter(this, R.layout.dtnmessages_list_cell ,new ArrayList<DtnMessage>(),getResources()); 
 			messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
-	
-			DtnActivity.this.dtnImplement = getDtnImplement( DtnBaseAlgorithm.MODE_CAN_MOVE,
-					DtnActivity.this.application, DtnActivity.this.messageBoxListHandler);
-		
+			
 			Thread thread = new Thread(new Runnable() {
 				public void run() {
 					DtnActivity.this.dtnImplement.start();
@@ -146,6 +203,7 @@ public class DtnActivity extends Activity {
 			thread.start();
 			this.fetchModeThread = new FetchModeThread(this.fetchModeHandler, this.dtnImplement, 1);
 			this.fetchModeThread.start();
+			this.startAlgorithmFlg = true;
 			return true;
 		}
 		return false;
@@ -155,6 +213,7 @@ public class DtnActivity extends Activity {
 		Log.d(MSG_TAG, "Stop Dtn Algorithm");
 		TextView dtn_status = (TextView)findViewById(R.id.dtn_status);
 		dtn_status.setText("DTNステータス： アルゴリズムストップ");
+		this.algorithmKind.setText("DTNアルゴリズム: not Set");
 		if(this.fetchModeThread != null){
 			this.fetchModeThread.stopThread();
 			this.fetchModeThread = null;
@@ -170,6 +229,7 @@ public class DtnActivity extends Activity {
 		messageBoxList.setAdapter(this.dtnMsgBoxAdapter);
 		// Reset TextView
 		this.dtn_status_myMode.setText("");
+		this.startAlgorithmFlg = false;
 	}
 
 	private void changeModeToNeedRescue(){

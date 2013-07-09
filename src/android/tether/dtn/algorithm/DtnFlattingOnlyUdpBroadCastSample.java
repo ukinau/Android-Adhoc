@@ -33,6 +33,7 @@ import android.util.Log;
  * The algorithm that constantly send the message I have through UDP 
  */
 public class DtnFlattingOnlyUdpBroadCastSample extends DtnBaseAlgorithm {
+	public final static String toSTRING = "DtnFlattingOnlyUdpBroadCastSample";
 	public final static String MSG_TAG = "DTN -> DtnFlattingOnlyUdpBroadCast";
 	private UdpReceiveThread udpReceiver;
 	private ReceivedBehaver revBehaver;
