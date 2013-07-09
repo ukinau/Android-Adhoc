@@ -85,8 +85,8 @@ public class UdpReceiveThread extends Thread {
 		String []receiveInfo = new String[2];
 		DatagramPacket packet= new DatagramPacket(buf,buf.length);
 		recSocket.receive(packet);//receive & wait
-		SocketAddress ipAddress = packet.getSocketAddress();
-		receiveInfo[1] = ipAddress.toString();
+		String ipAddress = packet.getAddress().getHostAddress();
+		receiveInfo[1] = ipAddress;
 		int len = packet.getLength();
 		String msg = new String(buf, 0, len);
 		receiveInfo[0] = msg;

@@ -15,19 +15,19 @@ import android.util.Log;
 
 public class TcpServerThread extends Thread{
 	private Socket sock;
-    private SocketAddress clientAddress;
+    private String clientAddress;
 	private String endString="¥0¥0";
     private Handler handler;
     private ReceivedBehaver behaver;
     
 	public TcpServerThread(Socket sock, Handler handler){
 		this.sock = sock;
-		this.clientAddress = sock.getRemoteSocketAddress();
+		this.clientAddress = sock.getInetAddress().getHostAddress();
 		this.handler = handler;
 	}
 	public TcpServerThread(Socket sock, ReceivedBehaver behaver){
 		this.sock = sock;
-		this.clientAddress = sock.getRemoteSocketAddress();
+		this.clientAddress = sock.getInetAddress().getHostAddress();
 		this.behaver = behaver;
 	}
 	
@@ -83,7 +83,7 @@ public class TcpServerThread extends Thread{
 			recvMsg = new String(receiveBuf , 0 , recvMsgSize);
 			recvMsg = recvMsg.split(endString)[0]; //終端文字以降切り捨て
 			recvInfo[0] = recvMsg;
-			recvInfo[1] = this.clientAddress.toString();
+			recvInfo[1] = this.clientAddress;
 			in.close();
     	} catch (IOException e) {
 			e.printStackTrace();
