@@ -56,7 +56,7 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 							case MODE_CAN_MOVE_HAVE_MESSAGE:
 								// b-con
 								switch(responce.message_kind){
-									case SprayAndWaitFormatBuilder.B_CON:
+									case SprayAndWaitFormatBuilder.MESSAGE_KIND_B_CON:
 										Log.d(MSG_TAG_RECV, "Receive packet(B-CON) using UDP from: "+ipAddress);
 										sendDemand(ipAddress);
 										break;
@@ -75,8 +75,8 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 					SprayAndWaitFormatBuilder responce = SprayAndWaitFormatBuilder.read(xml);
 					// Message or Have_message
 					switch (responce.message_kind) {
-						case SprayAndWaitFormatBuilder.DEMAND_ONLY:
-							Log.d(MSG_TAG_RECV, "Receive packet(DEMAND_ONLY) using TCP from: "+ipAddress);
+						case SprayAndWaitFormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY:
+							Log.d(MSG_TAG_RECV, "Receive packet(MESSAGE_KIND_REQUEST_DEMAND_ONLY) using TCP from: "+ipAddress);
 							switch(SprayAndWaitAlgorithm.this.getDtnMode()){
 								case MODE_CAN_MOVE_HAVE_MESSAGE:
 									sendMessagesIhave(ipAddress, responce.have_messages);
@@ -86,21 +86,23 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 									break;
 							}
 							break;
-						case SprayAndWaitFormatBuilder.MESSAGE_ONLY:
-							Log.d(MSG_TAG_RECV, "Receive packet(MESSAGE_ONLY) using TCP from: "+ipAddress);
-							ArrayList<DtnMessage> messages = toDtnMessageList(responce.messages);
-							for(int i=0;i<messages.size();i++){
-								SprayAndWaitAlgorithm.this.app.addDtnMessage(messages.get(i));
-								// Reflect the ListView
-								Message msg = new Message();
-								DtnMessage dtnM = messages.get(i);
-								msg.obj = dtnM;
-								SprayAndWaitAlgorithm.this.handler.sendMessage(msg);
-							}
-							switch(SprayAndWaitAlgorithm.this.getDtnMode()){
-								case MODE_CAN_MOVE:
-									SprayAndWaitAlgorithm.this.changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
-									break;
+						case SprayAndWaitFormatBuilder.MESSAGE_KIND_RESULT_DEMAND_ONLY:
+							Log.d(MSG_TAG_RECV, "Receive packet(MESSAGE_KIND_RESULT_DEMAND_ONLY) using TCP from: "+ipAddress);
+							if(responce.messages.size() > 0){
+								ArrayList<DtnMessage> messages = toDtnMessageList(responce.messages);
+								for(int i=0;i<messages.size();i++){
+									SprayAndWaitAlgorithm.this.app.addDtnMessage(messages.get(i));
+									// Reflect the ListView
+									Message msg = new Message();
+									DtnMessage dtnM = messages.get(i);
+									msg.obj = dtnM;
+									SprayAndWaitAlgorithm.this.handler.sendMessage(msg);
+								}
+								switch(SprayAndWaitAlgorithm.this.getDtnMode()){
+									case MODE_CAN_MOVE:
+										SprayAndWaitAlgorithm.this.changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
+										break;
+								}
 							}
 							break;
 					}
@@ -234,7 +236,7 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 		try {
 			SprayAndWaitFormatBuilder msg;
 			msg = new SprayAndWaitFormatBuilder();
-			msg.message_kind = SprayAndWaitFormatBuilder.B_CON;
+			msg.message_kind = SprayAndWaitFormatBuilder.MESSAGE_KIND_B_CON;
 			msg.myMacAddress = this.app.getMacAddress();
 			String sendXml = msg.buildXml();
 			new UdpSendThread(subnet+".255", AndroidTetherConstants.DTN_UDP_RECEIVE_PORT , sendXml, true).start();
@@ -244,9 +246,9 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 	}
 	
 	synchronized void sendDemand(String ipAddress) throws Exception{
-		if(!(SprayAndWaitAlgorithm.this.containsRequestTask(SprayAndWaitFormatBuilder.DEMAND_ONLY, ipAddress))){
+		if(!(SprayAndWaitAlgorithm.this.containsRequestTask(SprayAndWaitFormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY, ipAddress))){
 			SprayAndWaitFormatBuilder newBuilder = new SprayAndWaitFormatBuilder();
-			newBuilder.message_kind = SprayAndWaitFormatBuilder.DEMAND_ONLY;
+			newBuilder.message_kind = SprayAndWaitFormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY;
 			newBuilder.have_messages = SprayAndWaitAlgorithm.this.app.getHave_macAddressList();
 			try {
 				String sendXml = newBuilder.buildXml();
@@ -256,7 +258,7 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 				
 				// Add request-task
 				HashMap<Integer, String> requestMap = new HashMap<Integer, String>();
-				requestMap.put(SprayAndWaitFormatBuilder.DEMAND_ONLY, ipAddress);
+				requestMap.put(SprayAndWaitFormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY, ipAddress);
 				this.requestTask.add(requestMap);
 	
 			} catch (TransformerException e) {
@@ -272,13 +274,13 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 		if(sendableCandidateList.size()>0){
 			sendableCandidateList = updateDtnMessages(sendableCandidateList);
 			SprayAndWaitFormatBuilder newBuilder = new SprayAndWaitFormatBuilder();
-			newBuilder.message_kind = SprayAndWaitFormatBuilder.MESSAGE_ONLY;
+			newBuilder.message_kind = SprayAndWaitFormatBuilder.MESSAGE_KIND_RESULT_DEMAND_ONLY;
 			newBuilder.messages = sendableCandidateList;
 			try {
 				String sendXml = newBuilder.buildXml();
 				new TcpClientThread(ipAddress,
 						AndroidTetherConstants.DTN_TCP_SERVER_PORT,sendXml).start();
-				Log.d(MSG_TAG_SEND, "Send packet(MESSAGE_ONLY) using TCP to: "+ipAddress);
+				Log.d(MSG_TAG_SEND, "Send packet(DEMAND_HAVE_MESSAGES_RESULT) using TCP to: "+ipAddress);
 				// Set token updated list 
 				SprayAndWaitAlgorithm.this.app.setDtnMessagesList(toDtnMessageList(updateDtnMessages(messages)));
 			} catch (TransformerException e) {
@@ -294,13 +296,13 @@ public class SprayAndWaitAlgorithm extends DtnBaseAlgorithm {
 		if(sendableCandidateList.size()==1){
 			SprayAndWaitDtnMessage sendCandidateMsg = updateDtnMessage(sendableCandidateList.get(0));
 			SprayAndWaitFormatBuilder newBuilder = new SprayAndWaitFormatBuilder();
-			newBuilder.message_kind = SprayAndWaitFormatBuilder.MESSAGE_ONLY;
+			newBuilder.message_kind = SprayAndWaitFormatBuilder.MESSAGE_KIND_RESULT_DEMAND_ONLY;
 			newBuilder.messages.add(sendCandidateMsg);
 			try {
 				String sendXml = newBuilder.buildXml();
 				new TcpClientThread(ipAddress,
 						AndroidTetherConstants.DTN_TCP_SERVER_PORT,sendXml).start();
-				Log.d(MSG_TAG_SEND, "Send packet(MESSAGE_ONLY) using TCP to: "+ipAddress);
+				Log.d(MSG_TAG_SEND, "Send packet(DEMAND_HAVE_MESSAGES_RESULT) using TCP to: "+ipAddress);
 
 				// Set token updated msg 
 				SprayAndWaitAlgorithm.this.app.settingMyRescueMessage((DtnMessage)sendCandidateMsg);

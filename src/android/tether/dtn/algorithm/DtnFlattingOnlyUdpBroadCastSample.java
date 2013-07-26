@@ -99,7 +99,7 @@ public class DtnFlattingOnlyUdpBroadCastSample extends DtnBaseAlgorithm {
 				FormatBuilder msg;
 				try {
 					msg = new FormatBuilder();
-					msg.message_kind = FormatBuilder.MESSAGE_ONLY;
+					msg.message_kind = FormatBuilder.MESSAGE_KIND_MESSAGE_ONLY;
 					msg.messages.add(getTargetMsg());
 					try {
 						new UdpSendThread(subnet+".255", 
@@ -123,7 +123,7 @@ public class DtnFlattingOnlyUdpBroadCastSample extends DtnBaseAlgorithm {
 				subnet = ipAddress.split(lastIp)[0];
 				try {
 					msg = new FormatBuilder();
-					msg.message_kind = FormatBuilder.MESSAGE_ONLY;
+					msg.message_kind = FormatBuilder.MESSAGE_KIND_MESSAGE_ONLY;
 					ArrayList<DtnMessage> dtnMs =  this.app.getDtnMessages();
 					for(int i=0;i<dtnMs.size();i++){
 						msg.messages.add(dtnMs.get(i));

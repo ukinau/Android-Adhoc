@@ -17,16 +17,61 @@ import android.tether.dtn.DtnMessage;
 import android.tether.dtn.FormatBuilder;
 import android.tether.dtn.FormatBuilder.XmlReaderInterface;
 /**
- * Use B-CON,MESSAGE_ONLY(Not DtnMessage but SprayAndWaitDtnMessage),DEMAND_HAVE_MESSAGES
+ * Use B-CON,DEMAND_HAVE_MESSAGES_RESULT[MESSAGE_ONLY](Not DtnMessage but SprayAndWaitDtnMessage),DEMAND_ONLY
  * @author yukio7
  *
+ * B-CON
+ * <b-con>
+ *	<mac-address>
+ * </b-con>
+ *
+ * DEMAND_HAVE_MESSAGES
+ * <demand>
+ *		<have-message>
+ *			<mac-address>
+ * 		</have-message>
+ *</demand>
+ *
+ * MEESAGE_KIND_RESULT_DEMAND_ONLY
+ * <demand-result>
+ * 	 <messages-count>
+ *   <messages>
+ *		<message>
+ *			<mac-address>
+ *			<body>
+ *				<name>
+ *				<address>
+ *				<facebook>
+ *			</body>
+ *		</message>
+ *	</messages>
+ *</demand-result>
  */
 public class SprayAndWaitFormatBuilder extends FormatBuilder {
+	public final static int MESSAGE_KIND_RESULT_DEMAND_ONLY = 5;
 	public ArrayList<SprayAndWaitDtnMessage> messages;
 
 	public SprayAndWaitFormatBuilder() throws ParserConfigurationException {
 		super();
 		this.messages = new ArrayList<SprayAndWaitDtnMessage>();
+	}
+	
+	@Override
+	protected void setCustomAttribute(Element root,Document document){
+		switch(this.message_kind){
+			case MESSAGE_KIND_RESULT_DEMAND_ONLY:
+				Element demand_result_ele = document.createElement("demand-result");
+				Element messages_count_ele = document.createElement("messages-count");
+				int messages_count = messages.size();
+				Text messages_count_innerText = document.createTextNode(String.valueOf(messages_count));
+				messages_count_ele.appendChild(messages_count_innerText);
+				demand_result_ele.appendChild(messages_count_ele);
+				if(messages_count>0){
+					setMessages(demand_result_ele, document);
+				}
+				root.appendChild(demand_result_ele);
+				break;
+		}
 	}
 	
 	@Override
@@ -73,17 +118,17 @@ public class SprayAndWaitFormatBuilder extends FormatBuilder {
 			public FormatBuilder readNodes(NodeList nodes, FormatBuilder newBuilder, int kind) {
 				newSprayAndWaitBuilder.message_kind = kind;
 				switch(kind){
-					case B_CON:
+					case MESSAGE_KIND_B_CON:
 						Node bcon_container_node = nodes.item(1);
 						readBcon(bcon_container_node, newSprayAndWaitBuilder);
 						break;
-					case MESSAGE_ONLY:
-						Node message_container_node = nodes.item(1);
-						readMessages(message_container_node,newSprayAndWaitBuilder);
-						break;
-					case DEMAND_ONLY:
+					case MESSAGE_KIND_REQUEST_DEMAND_ONLY:
 						Node demand_container_node = nodes.item(1);
-						readDemands(demand_container_node, newSprayAndWaitBuilder, DEMAND_HAVE_MESSAGES);
+						readDemands(demand_container_node, newSprayAndWaitBuilder, DEMAND_TYPE_HAVE_MESSAGES);
+						break;
+					case MESSAGE_KIND_RESULT_DEMAND_ONLY:
+						Node demand_result_container_node = nodes.item(1);
+						readDemandHaveMessagesResult(demand_result_container_node,newSprayAndWaitBuilder);
 						break;
 				}
 				return newSprayAndWaitBuilder;
@@ -93,6 +138,15 @@ public class SprayAndWaitFormatBuilder extends FormatBuilder {
 		return newSprayAndWaitBuilder;
 	}
 
+	protected static void readDemandHaveMessagesResult(Node demand_result_container_node, SprayAndWaitFormatBuilder newBuilder){
+		NodeList nodes = demand_result_container_node.getChildNodes();
+		Node messages_count_node = nodes.item(0);
+		int messages_count = Integer.parseInt(messages_count_node.getFirstChild().getNodeValue());
+		if(messages_count > 0){
+			readMessages(nodes.item(1),newBuilder);
+		}
+	}
+	
 	protected static void readMessages(Node message_container_node,SprayAndWaitFormatBuilder newBuilder){
 		NodeList messageNodes = message_container_node.getChildNodes();
 		if(messageNodes != null){

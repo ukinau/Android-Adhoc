@@ -27,18 +27,18 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public class FormatBuilder {
-	public static final int B_CON = 0;
+	public static final int MESSAGE_KIND_B_CON = 0;
 	/*<b-con>
 	 * 	<my-mac-address>
 	 *</b-con>
 	 */
-	public static final int DEMAND_ONLY = 1;
+	public static final int MESSAGE_KIND_REQUEST_DEMAND_ONLY = 1;
 	/*<demand>
 		<have-message>
 			<mac-address>
 		</have-message>
 	</demand>*/
-	public static final int MESSAGE_ONLY = 2;
+	public static final int MESSAGE_KIND_MESSAGE_ONLY = 2;
 	/*
 	<messages>
 		<message>
@@ -51,7 +51,7 @@ public class FormatBuilder {
 		</message>
 	</messages>
 	 */
-	public static final int MESSAGE_AND_DEMAND = 3;
+	public static final int MESSAGE_KIND_REQUEST_MESSAGE_AND_DEMAND = 3;
 	/*
 	<messages>
 		<message>
@@ -69,8 +69,8 @@ public class FormatBuilder {
 		</demand-message>
 	</demand>
 	 */
-	public static final int DEMAND_HAVE_MESSAGES = 99;
-	public static final int DEMAND_DEMAND_MESSAGES = 100;
+	public static final int DEMAND_TYPE_HAVE_MESSAGES = 99;
+	public static final int DEMAND_TYPE_DEMAND_MESSAGES = 100;
 
 	
 	public int message_kind;
@@ -98,16 +98,16 @@ public class FormatBuilder {
 		root.appendChild(kind_ele);
 		
 		switch(this.message_kind){
-			case FormatBuilder.B_CON:
+			case FormatBuilder.MESSAGE_KIND_B_CON:
 				setBcon(root,document);
-			case FormatBuilder.DEMAND_ONLY:
-				setDemand(root,document,DEMAND_HAVE_MESSAGES);
+			case FormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY:
+				setDemand(root,document,DEMAND_TYPE_HAVE_MESSAGES);
 				break;
-			case FormatBuilder.MESSAGE_ONLY:
+			case FormatBuilder.MESSAGE_KIND_MESSAGE_ONLY:
 				setMessages(root,document);
 				break;
-			case FormatBuilder.MESSAGE_AND_DEMAND:
-				setDemand(root,document,DEMAND_DEMAND_MESSAGES);
+			case FormatBuilder.MESSAGE_KIND_REQUEST_MESSAGE_AND_DEMAND:
+				setDemand(root,document,DEMAND_TYPE_DEMAND_MESSAGES);
 			    setMessages(root,document);
 				break;
 			default:
@@ -145,7 +145,7 @@ public class FormatBuilder {
 	
 	protected void setDemand(Element root,Document document,int demand_kind){
 		switch(demand_kind){
-			case DEMAND_HAVE_MESSAGES:
+			case DEMAND_TYPE_HAVE_MESSAGES:
 				Element demand_ele = document.createElement("demand");
 				for(int i=0;i<have_messages.size();i++){
 					Element have_message_ele = document.createElement("have-message");
@@ -158,7 +158,7 @@ public class FormatBuilder {
 				root.appendChild(demand_ele);
 				break;
 			
-			case DEMAND_DEMAND_MESSAGES:
+			case DEMAND_TYPE_DEMAND_MESSAGES:
 				demand_ele = document.createElement("demand");
 				for(int i=0;i<demand_messages.size();i++){
 					Element demand_message_ele = document.createElement("demand_message");
@@ -224,23 +224,23 @@ public class FormatBuilder {
 		newBuilder.message_kind = kind;
 		
 		switch(kind){
-			case FormatBuilder.B_CON:
+			case FormatBuilder.MESSAGE_KIND_B_CON:
 				Node bcon_container_node = nodes.item(1);
 				newBuilder = readBcon(bcon_container_node, newBuilder);
 				break;
-			case FormatBuilder.DEMAND_ONLY:
+			case FormatBuilder.MESSAGE_KIND_REQUEST_DEMAND_ONLY:
 				Node demand_container_node = nodes.item(1);
-				newBuilder = readDemands(demand_container_node,newBuilder,DEMAND_HAVE_MESSAGES);
+				newBuilder = readDemands(demand_container_node,newBuilder,DEMAND_TYPE_HAVE_MESSAGES);
 				break;
-			case FormatBuilder.MESSAGE_ONLY:
+			case FormatBuilder.MESSAGE_KIND_MESSAGE_ONLY:
 				Node message_container_node = nodes.item(1);
 				newBuilder = readMessages(message_container_node,newBuilder);
 				break;
-			case FormatBuilder.MESSAGE_AND_DEMAND:
+			case FormatBuilder.MESSAGE_KIND_REQUEST_MESSAGE_AND_DEMAND:
 				demand_container_node = nodes.item(1);
 				message_container_node = nodes.item(2);
 				newBuilder = readMessages(message_container_node,newBuilder);
-				newBuilder = readDemands(demand_container_node,newBuilder,DEMAND_DEMAND_MESSAGES);
+				newBuilder = readDemands(demand_container_node,newBuilder,DEMAND_TYPE_DEMAND_MESSAGES);
 				break;
 		}
 		return newBuilder; 
@@ -295,7 +295,7 @@ public class FormatBuilder {
 	
 	protected static FormatBuilder readDemands(Node demand_container_node,FormatBuilder newBuilder,int demand_kind){
 		switch(demand_kind){
-			case DEMAND_HAVE_MESSAGES:
+			case DEMAND_TYPE_HAVE_MESSAGES:
 				NodeList have_message_nodes = demand_container_node.getChildNodes();
 				if(have_message_nodes != null){
 					for(int i=0;i<have_message_nodes.getLength();i++){
@@ -305,7 +305,7 @@ public class FormatBuilder {
 					}
 				}
 				break;
-			case DEMAND_DEMAND_MESSAGES:
+			case DEMAND_TYPE_DEMAND_MESSAGES:
 				NodeList demand_message_nodes = demand_container_node.getChildNodes();
 				if(demand_message_nodes != null){
 					for(int i=0;i<demand_message_nodes.getLength();i++){
