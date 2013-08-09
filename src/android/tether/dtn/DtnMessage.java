@@ -16,8 +16,7 @@ public class DtnMessage implements Cloneable {
 	@Override
 	public String toString(){
 		return "名前: "+this.name+"\n"+
-				"住所: "+this.address+"\n"+
-				"Facebook: "+this.facebook;
+				"住所: "+this.address+"\n";
 	}
 	public Drawable toIconPicture(Resources r){
 		int resource_id;

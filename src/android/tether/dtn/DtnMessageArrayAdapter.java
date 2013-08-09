@@ -36,8 +36,8 @@ public class DtnMessageArrayAdapter extends ArrayAdapter<DtnMessage> {
 	    dtnMsg_TextInfo.setText(dtnMsg.toString());
 
 	    // アイコンをセット
-	    ImageView appInfoImage = (ImageView)v.findViewById(R.id.cell_image);
-	    appInfoImage.setImageDrawable(dtnMsg.toIconPicture(this.r));
+	    //ImageView appInfoImage = (ImageView)v.findViewById(R.id.cell_image);
+	    //appInfoImage.setImageDrawable(dtnMsg.toIconPicture(this.r));
 	
 	    return v;
     }
