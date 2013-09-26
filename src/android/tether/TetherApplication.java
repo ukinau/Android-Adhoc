@@ -249,7 +249,8 @@ public class TetherApplication extends Application {
 	}
 	
 	public String getMacAddress(){
-		if(this.settings.contains("MacAddress")){
+		if(this.settings.contains("MacAddress")
+				&& this.settings.getString("MacAddress",null) != null){
 			return this.settings.getString("MacAddress",null);
 		}
 		else{
