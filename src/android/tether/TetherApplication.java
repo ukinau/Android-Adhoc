@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import android.app.Application;
 import android.content.Context;
@@ -39,6 +40,8 @@ public class TetherApplication extends Application {
 	public final String DEFAULT_LANNETWORK = "192.168.2.0/24";
 	public final String DEFAULT_IPADDRESS = "192.168.2.254"; 
 	public final String DEFAULT_ENCSETUP   = "wpa_supplicant";
+	public final static int DIRECTION_TYPE_X = 0;
+	public final static int DIRECTION_TYPE_Y = 1;
 	
 	// Devices-Information
 	public String deviceType = Configuration.DEVICE_GENERIC; 
@@ -66,6 +69,16 @@ public class TetherApplication extends Application {
 	private DtnMessage myRescueMessage = null;
 	private ArrayList<String> dtnHave_macAddress = null;
 	public ArrayList<String> knownIpAddress = null;
+	
+	private LinkedList<Double> magnetic_y;
+	private double average_magnetic_y;		
+	
+	private LinkedList<Double> magnetic_x;
+	private double average_magnetic_x;
+	
+	// [0] = value, [1] = 符号(xだったらy、yだったらxの符号）
+	private double average_angle_y[];
+	private double average_angle_x[];
 	
 	@Override
 	public void onCreate() {
@@ -100,7 +113,14 @@ public class TetherApplication extends Application {
         this.tethercfg.read();
         
         this.dtnMsgs = new ArrayList<DtnMessage>();
-
+        
+        this.magnetic_y = new LinkedList<Double>();
+        this.magnetic_x = new LinkedList<Double>();
+        this.average_magnetic_y = 0;
+        this.average_magnetic_x = 0;
+        this.average_angle_y = new double[2];
+        this.average_angle_x = new double[2];
+        
 	}
 
 	@Override
@@ -163,6 +183,72 @@ public class TetherApplication extends Application {
 		}
 		
 		Log.d(MSG_TAG, "Creation of configuration-files took ==> "+(System.currentTimeMillis()-startStamp)+" milliseconds.");
+	}
+	
+	public synchronized void addRawManetic(double mag_x, double mag_y){
+		addRawMagnetic(mag_x, DIRECTION_TYPE_X);
+		addRawManetic(mag_y, DIRECTION_TYPE_Y);
+	}
+	
+	private void addRawMagnetic(double mag,int directionType){
+		switch(directionType){
+			case DIRECTION_TYPE_Y:
+				if(magnetic_y.size() < 25){
+					magnetic_y.addLast(mag);
+					double sum = 0;
+					for(int i=0;i<magnetic_y.size();i++){
+						 sum += magnetic_y.get(i);
+					}
+					this.average_magnetic_y = sum/magnetic_y.size();
+				}else{
+					double oldestMag = magnetic_y.removeFirst();
+					magnetic_y.addLast(mag);
+					this.average_magnetic_y -= oldestMag/magnetic_y.size();
+					this.average_magnetic_y += mag/magnetic_y.size();
+				}
+				break;
+			case DIRECTION_TYPE_X:
+				if(magnetic_x.size() < 25){
+					magnetic_x.addLast(mag);
+					double sum = 0;
+					for(int i=0;i<magnetic_x.size();i++){
+						 sum += magnetic_x.get(i);
+					}
+					this.average_magnetic_x = sum/magnetic_x.size();
+				}else{
+					double oldestMag = magnetic_x.removeFirst();
+					magnetic_x.addLast(mag);
+					this.average_magnetic_x -= oldestMag/magnetic_x.size();
+					this.average_magnetic_x += mag/magnetic_x.size();
+				}
+				break;
+		}
+	}
+	
+	public synchronized void updateAngle(){
+		double r = Math.sqrt(this.average_magnetic_x*this.average_magnetic_x 
+				+ this.average_magnetic_y*this.average_magnetic_y);
+		
+		this.average_angle_x[0] = Math.acos(this.average_magnetic_x/r)*180/Math.PI;
+		this.average_angle_x[1] = this.average_magnetic_y/Math.abs(this.average_magnetic_y);
+		
+		this.average_angle_y[0] = Math.acos(this.average_magnetic_y/r)*180/Math.PI;
+		this.average_angle_y[1] = this.average_magnetic_x/Math.abs(this.average_magnetic_x);
+		
+	}
+	
+	public double[] getAngle(int angleType){
+		double result[] = null;
+		updateAngle();
+		switch(angleType){
+			case DIRECTION_TYPE_Y:
+				result = this.average_angle_y;
+				break;
+			case DIRECTION_TYPE_X:
+				result = this.average_angle_x;
+				break;
+		}
+		return result; 
 	}
 
 	public void addDtnMessage(DtnMessage dtnMsg){
