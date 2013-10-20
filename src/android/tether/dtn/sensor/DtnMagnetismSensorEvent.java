@@ -9,11 +9,6 @@ import android.content.Context;
 public class DtnMagnetismSensorEvent implements SensorEventListener {
 	public static final String MSG_TAG = "DTN -> Sensor -> Magnetism";
 	
-	public DtnMagnetismSensorEvent(Context ctx){ 
-	}
-	
-	public void stop(){
-	}
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub

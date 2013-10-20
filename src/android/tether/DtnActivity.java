@@ -128,7 +128,7 @@ public class DtnActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		Log.d(MSG_TAG, "onResume");
-		this.magenetismEvent = new DtnMagnetismSensorEvent(this);
+		this.magenetismEvent = new DtnMagnetismSensorEvent();
 		// Listenerの登録
 		List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
 		if(sensors.size() > 0) {
@@ -148,8 +148,6 @@ public class DtnActivity extends Activity {
 		Log.d(MSG_TAG, "onPause");
 		stopDtnAlgorithm();
 		sensorManager.unregisterListener(this.accelEvent);
-		// Close stream for writing csv
-		this.magenetismEvent.stop();
 		sensorManager.unregisterListener(this.magenetismEvent);
 		this.magenetismEvent = null;
 	}
