@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.http.SslCertificate.DName;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +18,7 @@ import android.tether.dtn.algorithm.DtnBaseAlgorithm;
 import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCastSample;
 import android.tether.dtn.algorithm.spray_and_wait.SprayAndWaitAlgorithm;
 import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
+import android.tether.dtn.sensor.DtnMagnetismSensorEvent;
 import android.tether.dtn.sensor.FetchShakeAlgorithm;
 import android.tether.dtn.sensor.ShookBehaverInterface;
 import android.util.Log;
@@ -41,8 +43,9 @@ public class DtnActivity extends Activity {
 	private DtnMessageArrayAdapter dtnMsgBoxAdapter;
 	private DtnBaseAlgorithm dtnImplement;
 	private FetchModeThread fetchModeThread;
-	private SensorManager accelManager;
+	private SensorManager sensorManager;
 	private DtnAccelerateSensorEvent accelEvent;
+	private DtnMagnetismSensorEvent magenetismEvent;
 
 
 	private MultiDirectionSlidingDrawer mDrawerBottom;
@@ -104,7 +107,7 @@ public class DtnActivity extends Activity {
 		initAlgorithmSet();
 		this.algorithmKind = (TextView)findViewById(R.id.dtn_algorithm_kind);
 		this.dtn_status_myMode = (TextView)findViewById(R.id.dtn_status_my_mode);
-		this.accelManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+		this.sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		this.accelEvent = new DtnAccelerateSensorEvent(
 				new FetchShakeAlgorithm(new ShookBehaverInterface() {
 					public void after_shook_behaver() {
@@ -125,11 +128,17 @@ public class DtnActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		Log.d(MSG_TAG, "onResume");
+		this.magenetismEvent = new DtnMagnetismSensorEvent(this);
 		// Listenerの登録
-		List<Sensor> sensors = accelManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+		List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
 		if(sensors.size() > 0) {
 			Sensor s = sensors.get(0);
-			accelManager.registerListener(this.accelEvent, s, SensorManager.SENSOR_DELAY_UI);
+			sensorManager.registerListener(this.accelEvent, s, SensorManager.SENSOR_DELAY_UI);
+		}
+		sensors = sensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
+		if(sensors.size() > 0){
+			Sensor s = sensors.get(0);
+			sensorManager.registerListener(this.magenetismEvent, s, SensorManager.SENSOR_DELAY_UI); //about 80ms cycle 
 		}
 	}
 
@@ -138,7 +147,11 @@ public class DtnActivity extends Activity {
 		super.onPause();
 		Log.d(MSG_TAG, "onPause");
 		stopDtnAlgorithm();
-		accelManager.unregisterListener(this.accelEvent);
+		sensorManager.unregisterListener(this.accelEvent);
+		// Close stream for writing csv
+		this.magenetismEvent.stop();
+		sensorManager.unregisterListener(this.magenetismEvent);
+		this.magenetismEvent = null;
 	}
 
 	@Override
