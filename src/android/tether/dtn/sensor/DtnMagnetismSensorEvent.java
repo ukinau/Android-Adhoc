@@ -4,11 +4,17 @@ package android.tether.dtn.sensor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.tether.TetherApplication;
 import android.content.Context;
 
 public class DtnMagnetismSensorEvent implements SensorEventListener {
 	public static final String MSG_TAG = "DTN -> Sensor -> Magnetism";
 	
+	public TetherApplication app;
+	
+	public DtnMagnetismSensorEvent(TetherApplication app){
+		this.app = app;
+	}
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
@@ -19,6 +25,7 @@ public class DtnMagnetismSensorEvent implements SensorEventListener {
 			float x = event.values[0];
 			float y = event.values[1];
 			float z = event.values[2];
+			this.app.addRawManetic(x, y);
 		}
 	}
 }
