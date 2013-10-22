@@ -16,6 +16,7 @@ import android.tether.dtn.DtnMessageArrayAdapter;
 import android.tether.dtn.FetchModeThread;
 import android.tether.dtn.algorithm.DtnBaseAlgorithm;
 import android.tether.dtn.algorithm.DtnFlattingOnlyUdpBroadCastSample;
+import android.tether.dtn.algorithm.ctl_direction_udp.CtlDirectionUdpAlgorithm;
 import android.tether.dtn.algorithm.spray_and_wait.SprayAndWaitAlgorithm;
 import android.tether.dtn.sensor.DtnAccelerateSensorEvent;
 import android.tether.dtn.sensor.DtnMagnetismSensorEvent;
@@ -80,6 +81,7 @@ public class DtnActivity extends Activity {
 		this.algorithmSet = new ArrayList<String>();
 		this.algorithmSet.add(DtnFlattingOnlyUdpBroadCastSample.toSTRING);
 		this.algorithmSet.add(SprayAndWaitAlgorithm.toSTRING);
+		this.algorithmSet.add(CtlDirectionUdpAlgorithm.toSTRING);
 	}
 	
 	private void setDtnImplement(String dtnAlgorithm){

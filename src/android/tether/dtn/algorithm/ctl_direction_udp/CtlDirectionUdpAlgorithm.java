@@ -14,6 +14,7 @@ import android.tether.udp.UdpSendThread;
 import android.util.Log;
 
 public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
+	public final static String toSTRING = "相対方向制御アルゴリズム(UDP)";
 	public final static String MSG_TAG = "DTN -> CtlDirectionUdpAlgorithm";
 
 	public TetherApplication app;

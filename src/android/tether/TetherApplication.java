@@ -186,42 +186,33 @@ public class TetherApplication extends Application {
 	}
 	
 	public synchronized void addRawManetic(double mag_x, double mag_y){
-		addRawMagnetic(mag_x, DIRECTION_TYPE_X);
-		addRawManetic(mag_y, DIRECTION_TYPE_Y);
-	}
-	
-	private void addRawMagnetic(double mag,int directionType){
-		switch(directionType){
-			case DIRECTION_TYPE_Y:
-				if(magnetic_y.size() < 25){
-					magnetic_y.addLast(mag);
-					double sum = 0;
-					for(int i=0;i<magnetic_y.size();i++){
-						 sum += magnetic_y.get(i);
-					}
-					this.average_magnetic_y = sum/magnetic_y.size();
-				}else{
-					double oldestMag = magnetic_y.removeFirst();
-					magnetic_y.addLast(mag);
-					this.average_magnetic_y -= oldestMag/magnetic_y.size();
-					this.average_magnetic_y += mag/magnetic_y.size();
-				}
-				break;
-			case DIRECTION_TYPE_X:
-				if(magnetic_x.size() < 25){
-					magnetic_x.addLast(mag);
-					double sum = 0;
-					for(int i=0;i<magnetic_x.size();i++){
-						 sum += magnetic_x.get(i);
-					}
-					this.average_magnetic_x = sum/magnetic_x.size();
-				}else{
-					double oldestMag = magnetic_x.removeFirst();
-					magnetic_x.addLast(mag);
-					this.average_magnetic_x -= oldestMag/magnetic_x.size();
-					this.average_magnetic_x += mag/magnetic_x.size();
-				}
-				break;
+		// update mangetic power  Y
+		if(magnetic_y.size() < 25){
+			magnetic_y.addLast(mag_y);
+			double sum = 0;
+			for(int i=0;i<magnetic_y.size();i++){
+				 sum += magnetic_y.get(i);
+			}
+			this.average_magnetic_y = sum/magnetic_y.size();
+		}else{
+			double oldestMag = magnetic_y.removeFirst();
+			magnetic_y.addLast(mag_y);
+			this.average_magnetic_y -= oldestMag/magnetic_y.size();
+			this.average_magnetic_y += mag_y/magnetic_y.size();
+		}
+		
+		if(magnetic_x.size() < 25){
+			magnetic_x.addLast(mag_x);
+			double sum = 0;
+			for(int i=0;i<magnetic_x.size();i++){
+				 sum += magnetic_x.get(i);
+			}
+			this.average_magnetic_x = sum/magnetic_x.size();
+		}else{
+			double oldestMag = magnetic_x.removeFirst();
+			magnetic_x.addLast(mag_x);
+			this.average_magnetic_x -= oldestMag/magnetic_x.size();
+			this.average_magnetic_x += mag_x/magnetic_x.size();
 		}
 	}
 	
