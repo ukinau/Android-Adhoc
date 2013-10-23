@@ -2,6 +2,7 @@ package android.tether.dtn.algorithm.ctl_direction_udp;
 
 import java.util.ArrayList;
 
+import android.accounts.NetworkErrorException;
 import android.os.Handler;
 import android.os.Message;
 import android.tether.TetherApplication;
@@ -17,7 +18,6 @@ public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
 	public final static String toSTRING = "相対方向制御アルゴリズム(UDP)";
 	public final static String MSG_TAG = "DTN -> CtlDirectionUdpAlgorithm";
 
-	public TetherApplication app;
 	private UdpReceiveThread udpReceiver;
 	private ReceivedBehaver revUdpBehaver;
 	private int min_inverse_direction = 68; // 68 ~ 293°が逆方向
@@ -46,53 +46,58 @@ public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
 						CtlDirectionUdpFormatBuilder response = CtlDirectionUdpFormatBuilder.read(res);
 						switch(response.message_kind){
 							case CtlDirectionUdpFormatBuilder.MESSAGE_KIND_MESSAGE_ONLY:
-								//含有関係を求める
-								int contain_relation = comparedMessages(CtlDirectionUdpAlgorithm.this.app.getDtnMessages(),
-										response.messages);
-								int direction_relation = judge_relative_direction(CtlDirectionUdpAlgorithm.this.app.getAngle(
-										TetherApplication.DIRECTION_TYPE_Y), response.angle);
-								
-								// update messages
-								for(int i=0;i<response.messages.size();i++){
-									DtnMessage msg = response.messages.get(i);
-									if(!CtlDirectionUdpAlgorithm.this.app.containsDtnMessage(msg)){
-										CtlDirectionUdpAlgorithm.this.app.addDtnMessage(msg);
-										// Reflect the ListView
-										Message m = new Message();
-										m.obj = msg;
-										CtlDirectionUdpAlgorithm.this.handler.sendMessage(m);
-									}
-								}
-								switch(direction_relation){
-									case INVERSE_DIRECTION:
-										changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
-										break;
-									case SAME_DIRECTION:
-										switch(contain_relation){
-											case SAME_RELATION:
-												int ip_judge = compared_ipAddress(myIpAddress, ipAddress);
-												switch(ip_judge){
-													case LEFT_IS_BIG:
-														changeModeTo(MODE_CAN_MOVE);
-														break;
-													case LEFT_IS_SMALL:
-														changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
-														break;
-												}
-												break;
-											case RIGHT_CONTAIN_LEFT:
-												changeModeTo(MODE_CAN_MOVE);
-												break;
-											case LEFT_CONTAIN_RIGHT:
-											case NOT_CONTAIN_RELATION:
-												changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
-												break;
+								if(getDtnMode() != MODE_NEED_RESCUE){
+									//含有関係を求める
+									int contain_relation = comparedMessages(CtlDirectionUdpAlgorithm.this.app.getDtnMessages(),
+											response.messages);
+									int direction_relation = judge_relative_direction(CtlDirectionUdpAlgorithm.this.app.getAngle(
+											TetherApplication.DIRECTION_TYPE_Y), response.angle);
+									// update messages
+									for(int i=0;i<response.messages.size();i++){
+										DtnMessage msg = response.messages.get(i);
+										if(!CtlDirectionUdpAlgorithm.this.app.containsDtnMessage(msg)){
+											CtlDirectionUdpAlgorithm.this.app.addDtnMessage(msg);
+											// Reflect the ListView
+											Message m = new Message();
+											m.obj = msg;
+											CtlDirectionUdpAlgorithm.this.handler.sendMessage(m);
 										}
-								
+									}
+									switch(direction_relation){
+										case INVERSE_DIRECTION:
+											Log.d(MSG_TAG,"認識：逆方向");
+											changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
+											break;
+										case SAME_DIRECTION:
+											Log.d(MSG_TAG,"認識：同方向");
+											switch(contain_relation){
+												case SAME_RELATION:
+													int ip_judge = compared_ipAddress(myIpAddress, ipAddress);
+													switch(ip_judge){
+														case LEFT_IS_BIG:
+															changeModeTo(MODE_CAN_MOVE);
+															break;
+														case LEFT_IS_SMALL:
+															changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
+															break;
+													}
+													break;
+												case RIGHT_CONTAIN_LEFT:
+													changeModeTo(MODE_CAN_MOVE);
+													break;
+												case LEFT_CONTAIN_RIGHT:
+												case NOT_CONTAIN_RELATION:
+													changeModeTo(MODE_CAN_MOVE_HAVE_MESSAGE);
+													break;
+											}
+									
+									}
 								}
 								break;
 						}
-					}catch(Exception e){}
+					}catch(Exception e){
+						System.out.print(e);
+					}
 				}
 			}
 		};
@@ -180,8 +185,9 @@ public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
 	 * IPアドレスを比較する
 	 */
 	public int compared_ipAddress(String left, String right){
-		int host_left = Integer.parseInt(left.split(".")[3]);
-		int host_right = Integer.parseInt(right.split(".")[3]);
+		String []t = left.split("\\.");
+		int host_left = Integer.parseInt(left.split("\\.")[3]);
+		int host_right = Integer.parseInt(right.split("\\.")[3]);
 		int compared_value = host_left-host_right;
 		if(compared_value<0){
 			return LEFT_IS_SMALL;
@@ -205,10 +211,14 @@ public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
 	 */
 	public int judge_relative_direction(double[] left, double[] right){
 		double relative_angle = calculate_ralative_angle(left, right);
-		if(relative_angle > min_inverse_direction || 
+		Log.d(MSG_TAG,"compared angle: my["+left[0]+"]["+left[1]+"]"+"other["+right[0]+"]["+right[1]+"]");
+		Log.d(MSG_TAG,"相対角度:"+relative_angle);
+		if(relative_angle > min_inverse_direction && 
 				relative_angle < max_inverse_direction){
+			Log.d(MSG_TAG,"逆方向");
 			return INVERSE_DIRECTION;
 		}else{
+			Log.d(MSG_TAG,"同方向");
 			return SAME_DIRECTION;
 		}
 	}
@@ -224,6 +234,9 @@ public class CtlDirectionUdpAlgorithm extends DtnBaseAlgorithm{
 			result = left[0] - right[0];
 		}else{
 			result = left[0] + right[0];
+		}
+		if(result < 0){
+			result = 360 + result;
 		}
 		return result;
 	}

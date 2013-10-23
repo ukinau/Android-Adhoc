@@ -91,7 +91,11 @@ public class DtnActivity extends Activity {
 		} else if(SprayAndWaitAlgorithm.toSTRING.equals(dtnAlgorithm)){
 			this.dtnImplement = new SprayAndWaitAlgorithm(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
 			this.algorithmKind.setText("DTNアルゴリズム:"+dtnAlgorithm);
-		} //default
+		} else if(CtlDirectionUdpAlgorithm.toSTRING.equals(dtnAlgorithm)){
+			this.dtnImplement = new CtlDirectionUdpAlgorithm(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
+			this.algorithmKind.setText("DTNアルゴリズム:"+dtnAlgorithm);
+		}
+		//default
 		else{
 			this.dtnImplement = new DtnFlattingOnlyUdpBroadCastSample(DtnBaseAlgorithm.MODE_CAN_MOVE, this.application, this.messageBoxListHandler);
 			this.algorithmKind.setText("DTNアルゴリズム:"+DtnFlattingOnlyUdpBroadCastSample.toSTRING);
